@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="460" viewBox="0 0 1080 460" role="img" aria-labelledby="title desc">
+  <title id="title">Splunk distributed lab — intended topology</title>
+  <desc id="desc">Linux sources feed a Universal Forwarder, which forwards to an Indexer. An analyst uses a Search Head to search the Indexer. Ports are expected; guest configuration and live behavior remain unverified.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10" fill="#64d8b1"/></marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #eaf1fa; }
+      .node { fill: #162a40; stroke: #365572; stroke-width: 2; }
+      .name { font-size: 23px; font-weight: 700; }
+      .role { font-size: 17px; fill: #b7c9dd; }
+      .label { font-size: 16px; fill: #89e3c5; }
+      .flow { fill: none; stroke: #64d8b1; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1080" height="460" rx="16" fill="#0c1928"/>
+  <text x="42" y="47" font-size="27" font-weight="700">Splunk Distributed Lab</text>
+  <text x="42" y="77" font-size="17" fill="#b7c9dd">Intended topology · Google Cloud · single zone · application checks pending</text>
+  <rect class="node" x="42" y="127" width="210" height="100" rx="12"/>
+  <text class="name" x="147" y="165" text-anchor="middle">Linux sources</text>
+  <text class="role" x="147" y="193" text-anchor="middle">Inputs to be recovered</text>
+  <rect class="node" x="365" y="127" width="250" height="100" rx="12"/>
+  <text class="name" x="490" y="165" text-anchor="middle">splunk-uf</text>
+  <text class="role" x="490" y="193" text-anchor="middle">Universal Forwarder</text>
+  <path class="flow" d="M252 177H350"/>
+  <text class="label" x="309" y="157" text-anchor="middle">Collect</text>
+  <rect class="node" x="812" y="196" width="226" height="120" rx="12"/>
+  <text class="name" x="925" y="242" text-anchor="middle">splunk-idx</text>
+  <text class="role" x="925" y="271" text-anchor="middle">Indexer</text>
+  <path class="flow" d="M615 177H719V226H797"/>
+  <text class="label" x="709" y="141" text-anchor="middle">Forward events</text>
+  <text class="role" x="709" y="163" text-anchor="middle">Expected TCP 9997</text>
+  <rect class="node" x="42" y="286" width="210" height="100" rx="12"/>
+  <text class="name" x="147" y="326" text-anchor="middle">Analyst</text>
+  <text class="role" x="147" y="354" text-anchor="middle">Splunk Web</text>
+  <rect class="node" x="365" y="286" width="250" height="100" rx="12"/>
+  <text class="name" x="490" y="326" text-anchor="middle">splunk-sh</text>
+  <text class="role" x="490" y="354" text-anchor="middle">Search Head</text>
+  <path class="flow" d="M252 336H350"/>
+  <text class="label" x="309" y="269" text-anchor="middle">Expected</text>
+  <text class="role" x="309" y="291" text-anchor="middle">TCP 8000</text>
+  <path class="flow" d="M615 336H719V286H797"/>
+  <text class="label" x="713" y="369" text-anchor="middle">Search peer</text>
+  <text class="role" x="713" y="391" text-anchor="middle">Expected TCP 8089</text>
+  <text x="42" y="431" font-size="16" fill="#b7c9dd">Observed: three stopped VMs in us-central1-c. Diagram does not prove connectivity, TLS or ingestion.</text>
+</svg>

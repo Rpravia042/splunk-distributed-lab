@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKIP = {'.git', '.recovery', '__pycache__'}
 BLOCKED_NAMES = {'splunk.secret', 'passwd', 'passwords.conf', 'user-seed.conf', '.env'}
 BLOCKED_SUFFIXES = {'.pem', '.key', '.p12', '.pfx', '.lic', '.tar', '.tgz', '.zip', '.log'}
-TEXT_SUFFIXES = {'.md', '.py', '.sh', '.conf', '.json', '.yaml', '.yml', '.spl', '.txt'}
+TEXT_SUFFIXES = {'.md', '.mmd', '.svg', '.py', '.sh', '.conf', '.json', '.yaml', '.yml', '.spl', '.txt'}
 
 
 def issues_for_text(text):
