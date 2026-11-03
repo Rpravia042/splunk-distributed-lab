@@ -8,10 +8,10 @@ A three-node Linux lab on Google Cloud, separating data collection, indexing and
 
 ```mermaid
 flowchart LR
-    Logs[Linux data sources\nExact inputs pending recovery] --> UF[splunk-uf\nUniversal Forwarder]
-    UF -->|Forwarding: expected TCP 9997| IDX[splunk-idx\nIndexer]
-    SH[splunk-sh\nSearch Head] -->|Search peer: expected TCP 8089| IDX
-    Analyst[Analyst] -->|Splunk Web: expected TCP 8000| SH
+    Logs["Linux data sources<br/>Exact inputs pending recovery"] --> UF["splunk-uf<br/>Universal Forwarder"]
+    UF -->|"Expected forwarding: TCP 9997"| IDX["splunk-idx<br/>Indexer"]
+    SH["splunk-sh<br/>Search Head"] -->|"Expected search peer: TCP 8089"| IDX
+    Analyst["Analyst"] -->|"Expected Splunk Web: TCP 8000"| SH
 ```
 
 Roles come from the original lab description. Arrows describe the intended design; actual listeners, TLS and ingestion still require guest inspection. This is a single-indexer lab, with no demonstrated clustering or high availability.

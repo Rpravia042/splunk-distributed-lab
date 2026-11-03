@@ -28,12 +28,14 @@ The standard-snapshot list contained one available scheduled snapshot, associate
 
 ## Missing inventory
 
+The project's **Metadata** tab displayed no project key/value entries during this inspection. This does not rule out startup configuration in instance metadata or guest files. The Search Head detail page showed `enable-osconfig = TRUE` in its custom metadata.
+
 See the separately captured [network review](network-review.md) for the seven visible VPC firewall rules and the limitation on inherited-policy visibility.
 
 - Installed Splunk/UF version, build, service user and installation path.
 - Guest firewall, listening sockets, disk utilization and startup behavior.
 - Effective Splunk configuration, custom apps, dashboards, saved searches and scripts.
-- Project-level metadata/startup scripts, other snapshot categories, effective IAM, routes and hierarchical firewall policies.
+- Remaining instance startup metadata, other snapshot categories, effective IAM, routes and hierarchical firewall policies.
 - Configuration and data recovery from guest disks.
 
 Do not delete VMs or the project while these preservation tasks remain open.
