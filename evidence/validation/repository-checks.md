@@ -4,7 +4,7 @@ Last run locally on 2026-11-06 with Python 3.9.6. The same checks run in GitHub 
 
 | Check | Result | Scope |
 | --- | --- | --- |
-| `python3 -m unittest discover -s tests -v` | PASS, 16 tests | Collection boundaries, secret-store exclusions, symlinks, redaction syntax, version/address handling, provenance mismatches, dashboard syntax and private export count/truncation checks |
+| `python3 -m unittest discover -s tests -v` | PASS, 18 tests | Collection boundaries, secret-store exclusions, symlinks, redaction syntax, version/address handling, provenance mismatches, dashboard syntax and private JSON/CSV-gzip export count, multiline preservation and truncation checks |
 | `python3 scripts/check_repo.py` | PASS | Recognizable sensitive patterns, disallowed file types, local documentation links, reviewed image hashes, recovered artifact hashes, dashboard XML/JSON |
 | `bash -n scripts/original/system_metrics.sh` | PASS | Shell syntax only; the recovered script was not executed locally |
 | Screenshot review | PASS | Seven real captures reviewed; account/project/live-address details excluded |

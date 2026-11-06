@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Verify a private Splunk JSON export without printing event content.
 
-Accepts newline-delimited export envelopes, a JSON array, or a results envelope.
+Accepts JSON export envelopes or a gzip-compressed CSV from outputcsv.
 The expected JSON maps index names to counts measured with the same time bounds.
 This verifies readability/counts/required fields, not restore fidelity or secret absence.
 """
 import argparse
 from collections import Counter
+import csv
+import gzip
 import hashlib
 import json
 import os
@@ -57,27 +59,39 @@ def records(value):
         raise ValueError('Unexpected JSON value')
 
 
+def export_rows(path):
+    if path.name.endswith('.csv.gz'):
+        csv.field_size_limit(10 * 1024 * 1024)
+        try:
+            with gzip.open(path, 'rt', encoding='utf-8-sig', newline='') as stream:
+                yield from csv.DictReader(stream, strict=True)
+        except (csv.Error, EOFError, gzip.BadGzipFile, UnicodeError):
+            raise ValueError('Invalid or truncated CSV/gzip') from None
+    else:
+        with path.open(encoding='utf-8-sig') as stream:
+            for value in values(stream):
+                yield from records(value)
+
+
 def verify(path, expected):
     counts = Counter()
     missing = Counter()
     parse_error = None
     if not expected or any(not isinstance(v, int) or v < 0 for v in expected.values()):
         raise ValueError('Expected counts must be a non-empty object of non-negative integers')
-    with path.open(encoding='utf-8-sig') as stream:
-        try:
-            for value in values(stream):
-                for row in records(value):
-                    for key in ('_raw', '_time', 'host', 'source', 'sourcetype', 'index'):
-                        if key not in row or row[key] is None or not isinstance(row[key], (str, int, float)):
-                            missing[key] += 1
-                    index = row.get('index')
-                    if not isinstance(index, str):
-                        missing['scalar_index'] += 1
-                        continue
-                    counts[index] += 1
-        except ValueError as error:
-            # Parser messages are fixed strings; never include raw event fragments.
-            parse_error = str(error)
+    try:
+        for row in export_rows(path):
+            for key in ('_raw', '_time', 'host', 'source', 'sourcetype', 'index'):
+                if key not in row or row[key] is None or not isinstance(row[key], (str, int, float)):
+                    missing[key] += 1
+            index = row.get('index')
+            if not isinstance(index, str):
+                missing['scalar_index'] += 1
+                continue
+            counts[index] += 1
+    except ValueError as error:
+        # Parser messages are fixed strings; never include raw event fragments.
+        parse_error = str(error)
     digest = hashlib.sha256()
     with path.open('rb') as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b''):
@@ -86,7 +100,8 @@ def verify(path, expected):
     return {'status': 'PASS' if passed else 'FAIL', 'events': sum(counts.values()),
             'counts': dict(sorted(counts.items())), 'expected': expected,
             'missing_or_invalid_fields': dict(missing), 'bytes': path.stat().st_size,
-            'valid_complete_json': parse_error is None, 'parse_error': parse_error,
+            'format': 'csv-gzip' if path.name.endswith('.csv.gz') else 'json',
+            'valid_complete_export': parse_error is None, 'parse_error': parse_error,
             'sha256': digest.hexdigest(),
             'limits': 'Count and readability check only; not a restore test or sensitive-data certification.'}
 

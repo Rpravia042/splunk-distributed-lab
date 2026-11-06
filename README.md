@@ -2,7 +2,7 @@
 
 A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RAM samples travel through a Universal Forwarder to an Indexer, then become searchable from a separate Search Head.
 
-**Recovered and validated on 3 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The repository remains **private during review**. Cloud retirement is a separate, unfinished step; see the [preservation checklist](docs/preservation-checklist.md).
+**Recovered and validated on 3 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The repository remains **private during review**. The original VMs are being retained for future demonstrations. A later backup operation left insufficient free space for new Search Head searches; [current status and recovery work](docs/preservation-checklist.md) are tracked separately from the historical validation results below.
 
 ## Architecture
 

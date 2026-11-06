@@ -40,3 +40,7 @@ Selected, sanitized diagnostics: [SH](../evidence/validation/splunk-sh-diagnosti
 Search-peer health was positive, while the **Search Head's local health** was yellow for disk space and I/O wait. DiskMon reported 9,532 MB remaining below twice its 5,000 MB minimum; the IOWait panel reported a yellow threshold of 1. These warnings were observed, not repaired. The healthy peer label does not mean the whole deployment was free of warnings.
 
 `splunk_server` identifies the peer associated with results; [official guidance](https://help.splunk.com/en/splunk-enterprise/search/search-manual/10.2/retrieve-events/search-across-one-or-more-distributed-search-peers). It does not establish loss-free ingestion, redundancy or restore success.
+
+## Interview-readiness check — 2026-11-06
+
+A later live query for the last 20 minutes was refused because the Search Head dispatch directory reached the configured minimum free space. The backup operation left a verified 1.3 GB archive on that host; service state was still active/running. This check does not supersede the historical passing results above, but the current lab must not be described as ready for a live demonstration until storage is released and a fresh query succeeds.

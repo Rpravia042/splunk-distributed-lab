@@ -19,3 +19,9 @@ Empieza por el [README](../README.md), luego revisa [arquitectura](architecture.
 Consulta la [lista de preservación](preservation-checklist.md). El propietario solicitó conservar también todos los eventos; su copia privada se verifica por separado. Las VMs siguen encendidas y consumen recursos. No se ha autorizado ni realizado su eliminación, cambios de red, rotación de credenciales o reconfiguración de Splunk. Apagar o eliminar requiere una autorización posterior y concreta.
 
 Hay limitaciones documentadas: HTTP en Splunk Web, forwarding sin TLS, avisos de espacio/I/O y ausencia de alta disponibilidad. La sanitización automática ayuda, pero no sustituye la revisión humana antes de hacer público el repositorio.
+
+## Estado para la entrevista
+
+Se conservarán las mismas tres VMs. No se reinstaló Splunk ni se modificaron sus configuraciones originales. En Search Head, cinco archivos clave coinciden con sus hashes originales, incluido el dashboard y la unidad de servicio.
+
+El respaldo comprimido de 8.697.141 eventos pasó la validación completa en la VM, pero todavía requiere una copia local verificada. Su almacenamiento dejó poco espacio libre en Search Head y Splunk rechazó una búsqueda nueva por el mínimo de 5.000 MB. Antes de una demostración hay que liberar el almacenamiento del respaldo después de verificar su copia y repetir una búsqueda pequeña. El servicio continúa activo; los datos originales siguen en sus índices.

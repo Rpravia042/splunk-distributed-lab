@@ -23,3 +23,11 @@ Do not restart services, disable TLS, broaden firewall access, rotate credential
 - **Splunk Web event download blocked:** Chrome returned `ERR_BLOCKED_BY_CLIENT` for the export. A manual owner download was requested; export is not considered complete until the local file passes count and readability checks.
 - **Disk and I/O warnings:** SH local health showed yellow disk-space and IOWait warnings despite completed searches. Diagnose growth, retention and workload before increasing capacity or changing thresholds.
 - **Dashboard time-range mismatch:** compare the hardcoded five-minute SPL filter with global and data-source time parameters. Preserve the original while testing a corrected version in a separate environment.
+
+## Backup storage incident — 2026-11-06
+
+The combined event export generated a 1,315,156,954-byte compressed archive and used additional search-job storage. The export was finalized when free space fell below the planned margin. Its six index counts matched the census, and a subsequent complete CSV/gzip check passed for all 8,697,141 events.
+
+The retained archive still reduced Search Head free space to roughly 5.05 GB. A new search was then refused with the dispatch minimum-free-space check of 5,000 MB. `Splunkd.service` remained active. The distributed-search configuration, server configuration, dashboard XML, service unit and version file matched their original recovered SHA-256 hashes.
+
+Resolution is pending: verify a local copy before releasing server-side backup storage, then repeat a small end-to-end query. Do not delete index buckets or weaken the minimum-space protection. This incident demonstrates that archive size, intermediate search artifacts and operational free-space reserves must be budgeted separately.
