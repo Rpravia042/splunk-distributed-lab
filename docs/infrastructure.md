@@ -1,10 +1,10 @@
 # Infrastructure inventory
 
-Inspected in the authenticated Google Cloud console on **2026-11-03**, using read-only views. This is a sanitized transcription, not a raw API export.
+Inspected in the authenticated Google Cloud console on **2026-11-03**, using read-only views, followed by owner-authorized boot and temporary SSH access. This is a sanitized transcription, not a raw API export.
 
 | Property | splunk-sh | splunk-idx | splunk-uf |
 | --- | --- | --- | --- |
-| State | Stopped | Stopped | Stopped |
+| Initial → validated state | Stopped → Running | Stopped → Running | Stopped → Running |
 | Zone | us-central1-c | us-central1-c | us-central1-c |
 | Machine | e2-medium | e2-medium | e2-medium |
 | vCPU / memory | 2 / 4 GB | 2 / 4 GB | 2 / 4 GB |
@@ -20,7 +20,11 @@ Inspected in the authenticated Google Cloud console on **2026-11-03**, using rea
 | Secure Boot | Disabled | Disabled | Disabled |
 | vTPM / integrity monitoring | Enabled / enabled | Enabled / enabled | Enabled / enabled |
 
-The source image identifies the initial OS image; packages and OS changes inside the disks have not been inspected. The external-address column was empty while the VMs were stopped. This does not establish their exposure while running.
+Guest `/etc/os-release` confirmed CentOS Stream 10. All nodes report Splunk 10.6.1.1, build `b2ae2962645c`. SH/IDX use `/opt/splunk` and account `splunk`; UF uses `/opt/splunkforwarder` and `splunkfwd`. All services were active after boot. External addresses were assigned when the VMs started and are intentionally omitted.
+
+![Authorized running state](../evidence/screenshots/gcp-instances-running.jpg)
+
+At capture, SH disk usage was 54% (9.2 GB available), IDX 53% (9.3 GB available), and UF 20% (16 GB available). SH local health still reported yellow disk-space and I/O-wait warnings; see [validation](validation.md).
 
 The console showed a daily snapshot schedule beginning between 17:00 and 18:00 in its displayed timezone. A schedule is **not evidence of a complete or restorable backup**.
 
@@ -32,10 +36,8 @@ The project's **Metadata** tab displayed no project key/value entries during thi
 
 See the separately captured [network review](network-review.md) for the seven visible VPC firewall rules and the limitation on inherited-policy visibility.
 
-- Installed Splunk/UF version, build, service user and installation path.
-- Guest firewall, listening sockets, disk utilization and startup behavior.
-- Effective Splunk configuration, custom apps, dashboards, saved searches and scripts.
+- Guest firewall rules, comprehensive package inventory and vendor compatibility validation.
 - Remaining instance startup metadata, other snapshot categories, effective IAM, routes and hierarchical firewall policies.
-- Configuration and data recovery from guest disks.
+- Indexed-event export verification, independent backup and a tested restore.
 
 Do not delete VMs or the project while these preservation tasks remain open.

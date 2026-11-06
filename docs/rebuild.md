@@ -1,0 +1,14 @@
+# Rebuild in a separate environment
+
+This is a reconstruction guide based on recovered artifacts. No automated provisioning or teardown is included, and a clean-room rebuild has not yet been executed.
+
+1. **Choose supported versions and capacity.** Verify a matching vendor OS/version support matrix, license, storage and retention requirements. The observed 4 GB / 20 GB nodes produced capacity warnings; do not adopt that sizing as production guidance. Obtain installers from Splunk directly.
+2. **Define network boundaries.** Provide private UF→IDX forwarding and SH→IDX management paths, scoped administration and authenticated HTTPS Web access. Configure TLS and certificate validation for each transport before opening access. The recovered plain receiver is historical evidence.
+3. **Install each role with a dedicated service identity.** Generate fresh secrets and service units through the supported installation workflow. Read the recovered units as evidence; machine-specific resource limits and the UF ownership command are not portable installation instructions.
+4. **Create the index.** Reproduce `linux_os` and its three storage paths from the Indexer configuration in a dedicated app, with storage ownership and limits chosen for the new host. Configure the new receiver according to the chosen TLS design.
+5. **Prepare data generation.** Review the [original script](../scripts/original/system_metrics.sh). It prints one timestamp/CPU/RAM event. Create an appropriately owned log directory, deploy the script and install a reviewed schedule for the chosen account. The recovered cron entry runs every five minutes and appends stdout/stderr to separate files. Add rotation and failure handling before long-running use.
+6. **Configure UF monitoring and forwarding.** Reproduce the three source-to-sourcetype mappings, adapt paths to the new OS and configure the new destination. Replace `indexer.example.invalid`; verify file-read permission without broadening ownership unnecessarily.
+7. **Add the search peer using new credentials and trust.** Follow Splunk's supported peer setup. Import the Dashboard Studio definition into the `search` app, with deliberate ownership and permissions. Do not copy redacted server secrets or historical metadata timestamps as a new trust setup.
+8. **Validate the new environment.** Use the [queries](../searches), source readability, `btool --debug`, listeners, forwarding status and peer status. Record new results separately from the preserved evidence.
+
+The original script estimates CPU from `top` and RAM from `free`; output formats, locale, sampling interval and memory accounting deserve testing on the chosen OS. The original dashboard title and hardcoded time window are preserved. Improve them in a new version with a documented comparison, rather than changing the original evidence.

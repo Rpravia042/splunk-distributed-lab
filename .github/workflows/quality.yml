@@ -20,3 +20,5 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Check repository hygiene and evidence hashes
         run: python3 scripts/check_repo.py
+      - name: Check original metrics script syntax
+        run: bash -n scripts/original/system_metrics.sh

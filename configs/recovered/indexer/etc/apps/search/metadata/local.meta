@@ -1,0 +1,9 @@
+[inputs/splunktcp%3A%2F%2F9997]
+owner = admin
+version = 10.6.1.1
+modtime = 1793654661.806884000
+
+[indexes/linux_os]
+owner = admin
+version = 10.6.1.1
+modtime = 1793661218.882740000

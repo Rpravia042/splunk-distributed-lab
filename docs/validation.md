@@ -1,43 +1,42 @@
-# Validation plan and results
+# Validation results
 
-**No live checks have passed yet.** The VMs were stopped during inspection. Repository checks are independent of the following deployment checks.
+Validated on **2026-11-03 UTC** after the owner authorized boot and temporary SSH access. Existing data was queried; no synthetic marker was injected. Counts describe fixed observations, not a continuously updated monitor.
 
-| ID | Check | Evidence required for PASS | Current result |
-| --- | --- | --- | --- |
-| V01 | Version and service identity | Node, version/build, service unit and process owner | Pending guest access |
-| V02 | UF inputs | Reviewed source stanza, readable source file, intended index/sourcetype | Pending |
-| V03 | UF destination | Effective outputs and active connection to the intended indexer | Pending |
-| V04 | Indexer receiver | Effective receiver stanza, listener and receiving counters/logs | Pending |
-| V05 | Index routing | Index exists, storage paths/permissions and observed events in it | Pending |
-| V06 | Distributed search | Peer status on SH and query results from the intended indexer | Pending |
-| V07 | End-to-end visibility | Existing known event found through SH, time range and source documented | Pending |
-| V08 | Time and parsing | Event time, host, source, sourcetype and expected fields inspected | Pending |
-| V09 | Transport protection | Relevant TLS settings and certificate validation evidence | Pending |
-| V10 | Preservation | Required files recovered, gaps reviewed, private backup readable | Incomplete |
+| ID | Check | Result and evidence |
+| --- | --- | --- |
+| V01 | Version and service identity | **PASS**: Splunk 10.6.1.1, build `b2ae2962645c`, all nodes. SH/IDX `Splunkd.service` as `splunk`; UF `SplunkForwarder.service` as `splunkfwd`; all active/running. |
+| V02 | Inputs and source access | **PASS**: all three UF monitor stanzas effective; service user can read all three sources. |
+| V03 | Forwarding destination | **PASS**: effective target matches recovered output; established UF→IDX TCP 9997 connection seen at both ends. |
+| V04 | Receiver | **PASS**: effective `[splunktcp://9997]`, listener and indexed events. |
+| V05 | Index routing | **PASS**: effective `linux_os` paths and events returned from that index. No retention or durability guarantee tested. |
+| V06 | Distributed search | **PASS**: sole peer `splunk-idx` Up, replication Successful, Healthy, Enabled; completed SH query returns its events. |
+| V07 | End-to-end visibility | **PASS**: 129,310 existing events in the recorded 24-hour query; three expected sourcetypes. |
+| V08 | Metrics fields and dashboard | **PASS within sample**: six of six events have CPU/RAM fields; dashboard rendered 5.4% / 21.02%. No broad timestamp or measurement-accuracy audit. |
+| V09 | Transport protection | **GAPS OBSERVED**: Web uses HTTP; forwarding receiver is plain `splunktcp`; peer URI uses HTTPS but certificate verification was not established. |
+| V10 | Preservation | **CONFIGURATION VERIFIED**: 41 private source files verified, 19 reviewed artifacts published. Event-export and independent-backup status are tracked separately. |
 
-## Existing-data searches
+## Distributed search observation
 
-Replace `lab` with the **observed** index; it is only a reference name here. Run on the Search Head in an authorized session. Bound the time range to the original activity, and record both timezone and query interval. An empty last-24-hour search can be expected for a stopped lab.
+[Query](../searches/validate-data-path.spl), executed through SH. Search interval: **2026-11-02 16:26:28 UTC to 2026-11-03 16:26:28 UTC**. Splunk displayed completion and 129,310 matched events.
 
-```spl
-index=lab earliest=-24h latest=now
-| stats count min(_time) AS first_event max(_time) AS last_event
-    by host source sourcetype splunk_server
-| convert ctime(first_event) ctime(last_event)
-```
+| host | sourcetype | splunk_server | count | Latest event UTC |
+| --- | --- | --- | ---: | --- |
+| splunk-uf | linux_boot | splunk-idx | 52,045 | 2026-11-02 23:09:10 |
+| splunk-uf | linux_messages | splunk-idx | 77,242 | 2026-11-03 16:26:27 |
+| splunk-uf | system_metrics | splunk-idx | 23 | 2026-11-03 16:25:01 |
 
-To inspect metadata without publishing raw event content:
+These are historical counts, not an expectation that every source produces new events every minute. [Screenshot](../evidence/screenshots/splunk-distributed-search.jpg).
 
-```spl
-index=lab earliest=-24h latest=now
-| head 20
-| table _time host source sourcetype splunk_server
-```
+## Parsing and dashboard observation
 
-`splunk_server` identifies the search peer associated with events; see [Splunk's distributed-peer search guidance](https://help.splunk.com/en/splunk-enterprise/search/search-manual/10.2/retrieve-events/search-across-one-or-more-distributed-search-peers). It does not alone establish loss-free ingestion or durability.
+[Field query](../searches/validate-metric-fields.spl), interval **2026-11-03 15:59:16 to 16:29:16 UTC**: count=6, cpu_parsed=6, ram_parsed=6. Latest event=16:25:01 UTC, CPU=5.40, RAM=21.02, host=`splunk-uf`, peer=`splunk-idx`. [Screenshot](../evidence/screenshots/splunk-field-validation.jpg).
 
-## Result record
+The [reviewed source excerpt](../evidence/validation/metrics-sample.txt) contains only timestamps and percentages. The [dashboard screenshot](../evidence/screenshots/splunk-dashboard.jpg) showed matching values at capture. Its hardcoded `earliest=-5m` and five-minute sample cadence limit the meaning of an average; see [lessons learned](lessons-learned.md).
 
-Each record needs: check ID, UTC capture time, node, command/query, time range, expected result, actual result, PASS/FAIL/BLOCKED, limitations and reviewed evidence path. Preserve failure output privately; redact before publication. Do not mark a query as passed merely because the search UI opened.
+## Runtime evidence
 
-End-to-end testing with a newly generated marker modifies source data and Splunk indexes. It requires separate authorization if existing data cannot demonstrate the path.
+Selected, sanitized diagnostics: [SH](../evidence/validation/splunk-sh-diagnostics.txt), [IDX](../evidence/validation/splunk-idx-diagnostics.txt), [UF](../evidence/validation/splunk-uf-diagnostics.txt). Full diagnostic captures remain private. `btool` describes merged on-disk configuration; listeners, sockets and successful searches supply separate runtime evidence.
+
+Search-peer health was positive, while the **Search Head's local health** was yellow for disk space and I/O wait. DiskMon reported 9,532 MB remaining below twice its 5,000 MB minimum; the IOWait panel reported a yellow threshold of 1. These warnings were observed, not repaired. The healthy peer label does not mean the whole deployment was free of warnings.
+
+`splunk_server` identifies the peer associated with results; [official guidance](https://help.splunk.com/en/splunk-enterprise/search/search-manual/10.2/retrieve-events/search-across-one-or-more-distributed-search-peers). It does not establish loss-free ingestion, redundancy or restore success.

@@ -1,0 +1,345 @@
+{
+  "captured_source_files": 41,
+  "published_artifacts": [
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/search/local/data/ui/views/uf_system_performance.xml",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:19:35.569424+00:00",
+      "artifact": "configs/recovered/search-head/etc/apps/search/local/data/ui/views/uf_system_performance.xml",
+      "sha256": "26a2e256bd84321d289bbe67f0cc1bbc34ec8ce1c7148e22f671ed7246ad0990",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes; global_time is a dashboard input variable, not a credential."
+      ]
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/splunk.version",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:19:35.569424+00:00",
+      "artifact": "configs/recovered/search-head/etc/splunk.version",
+      "sha256": "b023794ac81b250ae86a85c17c9e671083bf1300f3e77da7c98b853343056288",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/local/distsearch.conf",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:19:35.569424+00:00",
+      "artifact": "configs/recovered/search-head/etc/system/local/distsearch.conf",
+      "sha256": "239f13f8957ac59382b4b76273a74cf66a5a0ab381f0978bc53c867044123b04",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "Live indexer address replaced with indexer.example.invalid and/or credential values redacted."
+      ]
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/local/server.conf",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:19:35.569424+00:00",
+      "artifact": "configs/recovered/search-head/etc/system/local/server.conf",
+      "sha256": "196cdf3d7b466476bc1d1b331e44c231fef8201a5a3bc54fb2246ba55df70fff",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "Live indexer address replaced with indexer.example.invalid and/or credential values redacted."
+      ]
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/systemd/system/Splunkd.service",
+      "source_base": "filesystem root",
+      "captured_at": "2026-11-03T16:19:35.569424+00:00",
+      "artifact": "configs/recovered/search-head/etc/systemd/system/Splunkd.service",
+      "sha256": "ad3e2d5b646860ef17a4f15b8c40506171e5a8bd6622060573d0659ee59f6d7c",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/search/metadata/local.meta",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:30:30.548324+00:00",
+      "artifact": "configs/recovered/search-head/etc/apps/search/metadata/local.meta",
+      "sha256": "8c7821e44a2ed520e7bbab560b052322e3438d4447e7cab618afd2e0270295de",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/search/local/indexes.conf",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:16:19.829728+00:00",
+      "artifact": "configs/recovered/indexer/etc/apps/search/local/indexes.conf",
+      "sha256": "71af9e5c3cae62166abfaf2cf84f6bfcb85431bd891ff644a01740035cc683e9",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/search/local/inputs.conf",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:16:19.829728+00:00",
+      "artifact": "configs/recovered/indexer/etc/apps/search/local/inputs.conf",
+      "sha256": "f94ae56a748b279df28a2c219a97c4a8dd599730b34fba04aa97ad5a50fefa0a",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/splunk.version",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:16:19.829728+00:00",
+      "artifact": "configs/recovered/indexer/etc/splunk.version",
+      "sha256": "b023794ac81b250ae86a85c17c9e671083bf1300f3e77da7c98b853343056288",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/system/local/server.conf",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:16:19.829728+00:00",
+      "artifact": "configs/recovered/indexer/etc/system/local/server.conf",
+      "sha256": "9952b360ca7dae1a6314e87af23749a51bc7dbbdcdf7fe6dc1ba6c492eb6839c",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "Live indexer address replaced with indexer.example.invalid and/or credential values redacted."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/systemd/system/Splunkd.service",
+      "source_base": "filesystem root",
+      "captured_at": "2026-11-03T16:16:19.829728+00:00",
+      "artifact": "configs/recovered/indexer/etc/systemd/system/Splunkd.service",
+      "sha256": "ad3e2d5b646860ef17a4f15b8c40506171e5a8bd6622060573d0659ee59f6d7c",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/search/metadata/local.meta",
+      "source_base": "/opt/splunk",
+      "captured_at": "2026-11-03T16:30:30.609132+00:00",
+      "artifact": "configs/recovered/indexer/etc/apps/search/metadata/local.meta",
+      "sha256": "4330f56e9e66e740b1cb5d90df704ebd6aa928cb838403c313c14a8c04e6d846",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/splunk.version",
+      "source_base": "/opt/splunkforwarder",
+      "captured_at": "2026-11-03T16:19:35.934233+00:00",
+      "artifact": "configs/recovered/universal-forwarder/etc/splunk.version",
+      "sha256": "b023794ac81b250ae86a85c17c9e671083bf1300f3e77da7c98b853343056288",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/system/local/inputs.conf",
+      "source_base": "/opt/splunkforwarder",
+      "captured_at": "2026-11-03T16:19:35.934233+00:00",
+      "artifact": "configs/recovered/universal-forwarder/etc/system/local/inputs.conf",
+      "sha256": "cf32d6f79c18d00d35012df401d2061d909d3ff6ba29f3148cf7cdb34e2a3113",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/system/local/outputs.conf",
+      "source_base": "/opt/splunkforwarder",
+      "captured_at": "2026-11-03T16:19:35.934233+00:00",
+      "artifact": "configs/recovered/universal-forwarder/etc/system/local/outputs.conf",
+      "sha256": "de17a7c7910f9a1775d217254bc3ccff65594ca993150f14ed8b5e3ee8d3f431",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "Live indexer address replaced with indexer.example.invalid and/or credential values redacted."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/system/local/server.conf",
+      "source_base": "/opt/splunkforwarder",
+      "captured_at": "2026-11-03T16:19:35.934233+00:00",
+      "artifact": "configs/recovered/universal-forwarder/etc/system/local/server.conf",
+      "sha256": "abe11820e0e7d467100b1e95f9b4484b9ea41e121ff560c050c6539417d4d6fe",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "Live indexer address replaced with indexer.example.invalid and/or credential values redacted."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/systemd/system/SplunkForwarder.service",
+      "source_base": "filesystem root",
+      "captured_at": "2026-11-03T16:19:35.934233+00:00",
+      "artifact": "configs/recovered/universal-forwarder/etc/systemd/system/SplunkForwarder.service",
+      "sha256": "ddbcdad98d6c8cde3a1485b196e4a6ea1eb2a9733ba00442c9e8b9290a3df49f",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "usr/local/bin/system_metrics.sh",
+      "source_base": "filesystem root",
+      "captured_at": "2026-11-03T16:26:06.330811+00:00",
+      "artifact": "scripts/original/system_metrics.sh",
+      "sha256": "21c15e88a95a51b9f6aaeef2f36e162d2a022e789ea1cd4bc5a14589ae4f4642",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "var/spool/cron/splunkfwd",
+      "source_base": "filesystem root",
+      "captured_at": "2026-11-03T16:26:06.330811+00:00",
+      "artifact": "configs/recovered/universal-forwarder/splunkfwd.crontab",
+      "sha256": "c2ac922d4ab6ac20d1be990615b008c5f9859a562f463f6310693acbe88b23e1",
+      "review": "content reviewed; credential stores excluded",
+      "changes": [
+        "No content changes after manual review."
+      ]
+    }
+  ],
+  "private_only": [
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/learned/local/props.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/splunk_instrumentation/local/telemetry.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/local/migration.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/local/restmap.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/local/web.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/users/admin/search/local/ui-tour.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/users/admin/user-prefs/local/user-prefs.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/learned/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/apps/splunk_instrumentation/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/system/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/users/admin/search/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-sh",
+      "source_path": "etc/users/admin/user-prefs/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/learned/local/props.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/splunk_instrumentation/local/telemetry.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/system/local/migration.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/system/local/restmap.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/system/local/web.conf",
+      "reason": "Generated vendor routes, telemetry identifiers, learned heuristics or personal UI preferences; preserved privately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/learned/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/apps/splunk_instrumentation/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-idx",
+      "source_path": "etc/system/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "var/log/splunk-lab/system_performance.log",
+      "reason": "Raw source data retained privately; only an explicitly reviewed three-event excerpt is published."
+    },
+    {
+      "node": "splunk-uf",
+      "source_path": "etc/system/metadata/local.meta",
+      "reason": "Generated metadata or personal preferences; preserved privately. Application-relevant search metadata is published separately."
+    }
+  ]
+}

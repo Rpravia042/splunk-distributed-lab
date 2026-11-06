@@ -1,26 +1,27 @@
 # Architecture
 
-## Responsibilities
+## Observed data path
 
-- **splunk-uf:** read configured sources and forward events. Source paths, indexes and sourcetypes await recovery.
-- **splunk-idx:** receive and index events, retain buckets, and answer distributed searches.
-- **splunk-sh:** provide Splunk Web and dispatch searches to the indexer.
+1. On `splunk-uf`, a cron job runs `/usr/local/bin/system_metrics.sh` every five minutes. It appends timestamp, CPU usage and RAM usage to `/var/log/splunk-lab/system_performance.log`.
+2. Universal Forwarder monitors that file plus `/var/log/messages` and `/var/log/boot.log`, assigning index `linux_os` and sourcetypes `system_metrics`, `linux_messages` and `linux_boot`.
+3. UF forwards to the indexer's TCP 9997 receiver. Both hosts showed the same established connection during inspection.
+4. `splunk-idx` stores the events under `$SPLUNK_DB/linux_os/{db,colddb,thaweddb}`.
+5. `splunk-sh` uses an HTTPS search-peer URI on TCP 8089. The peer UI and completed queries confirm distributed search.
+6. The analyst opens Splunk Web on the Search Head, TCP 8000, and views the recovered dashboard.
 
-The node roles are owner-reported. Compute Engine independently confirms the three named machines, their zone, source image, machine type and disks. A VM name alone does not verify its Splunk role or running configuration.
+## Network flows and evidence
 
-## Intended network flows
-
-| Source | Destination | Typical port | Verification needed |
+| Source | Destination | Port | Observed evidence |
 | --- | --- | --- | --- |
-| UF | Indexer | TCP 9997 | `outputs.conf`, receiver stanza, TLS, listener and counters |
-| Search Head | Indexer | TCP 8089 | `distsearch.conf`, peer trust and connected status |
-| Administrator | Search Head | TCP 8000 | `web.conf`, TLS and access restriction |
-| Administrator | Linux nodes | TCP 22 | Existing SSH/OS Login path and firewall scope |
+| UF | IDX | TCP 9997 | Recovered outputs/receiver, effective configuration, active socket, indexed events |
+| SH | IDX | TCP 8089 | Recovered and effective `distsearch.conf`, healthy peer, search results |
+| Administrator | SH | TCP 8000 | Authenticated Splunk Web session; HTTP and `enableSplunkWebSSL=false` |
+| Administrator | Linux nodes | TCP 22 | Owner-authorized browser SSH with temporary access |
 
-These are conventional ports, not confirmed guest listeners. A firewall allow rule also does not prove a service is listening. Splunk documents these relationships in [Components and their relationship with the network](https://help.splunk.com/?resourceId=Splunk_InheritedDeployment_Ports).
+The indexer also had TCP 8000 and 8089 listeners. The UF had no listening socket on 8000, 8089 or 9997 at capture. Listener presence and VPC rules alone do not establish Internet reachability. See [network review](network-review.md).
 
-## Boundaries and limitations
+## Boundaries
 
-One indexer means a single failure domain for indexed data and search availability. All nodes share one zone and the default VPC. No replication factor, search factor, cluster manager, deployer or load balancer has been evidenced. Use a dedicated network, scoped access, verified transport encryption and tested backups for a future redesign; do not apply changes to the preserved lab without approval.
+All VMs share one zone and the default VPC. One indexer is a single failure domain; no indexer cluster, SH cluster, cluster manager or replication guarantee was demonstrated. The forwarding receiver uses `splunktcp`, not a TLS receiver, and UF effective `useACK=false`. Search-peer HTTPS does not itself prove certificate identity verification. These are preserved lab limitations, not recommended production settings.
 
-Keep the observed design separate from proposed improvements. This repository does not include an automatic deployment or teardown command.
+Conventional component relationships are documented in [Splunk's network guide](https://help.splunk.com/?resourceId=Splunk_InheritedDeployment_Ports). The [rebuild guide](rebuild.md) separates future security choices from recovered behavior.

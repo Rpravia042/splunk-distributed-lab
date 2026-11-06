@@ -1,0 +1,3 @@
+index=linux_os earliest=-24h latest=now
+| stats count latest(_time) AS latest_event by host sourcetype splunk_server
+| eval latest_event=strftime(latest_event,"%Y-%m-%d %H:%M:%S %z")

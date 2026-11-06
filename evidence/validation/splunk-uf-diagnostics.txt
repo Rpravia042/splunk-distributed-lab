@@ -1,0 +1,38 @@
+Read-only diagnostic excerpts; selected from private capture.
+Node: splunk-uf
+Captured UTC: 2026-11-03T16:26:06.330811+00:00
+
+CHECK: service; exit_code=0
+MainPID=1050
+User=splunkfwd
+Group=splunkfwd
+ActiveState=active
+SubState=running
+FragmentPath=/etc/systemd/system/SplunkForwarder.service
+ActiveEnterTimestamp=Tue 2026-11-03 15:55:57 UTC
+
+CHECK: disk_usage; exit_code=0
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        20G  3.8G   16G  20% /
+
+CHECK: effective_inputs; exit_code=0
+/opt/splunkforwarder/etc/system/local/inputs.conf                          [monitor:///var/log/boot.log]
+/opt/splunkforwarder/etc/system/local/inputs.conf                          disabled = 0
+/opt/splunkforwarder/etc/system/local/inputs.conf                          index = linux_os
+/opt/splunkforwarder/etc/system/local/inputs.conf                          sourcetype = linux_boot
+/opt/splunkforwarder/etc/system/local/inputs.conf                          [monitor:///var/log/messages]
+/opt/splunkforwarder/etc/system/local/inputs.conf                          disabled = 0
+/opt/splunkforwarder/etc/system/local/inputs.conf                          index = linux_os
+/opt/splunkforwarder/etc/system/local/inputs.conf                          sourcetype = linux_messages
+/opt/splunkforwarder/etc/system/local/inputs.conf                          [monitor:///var/log/splunk-lab/system_performance.log]
+/opt/splunkforwarder/etc/system/local/inputs.conf                          disabled = 0
+/opt/splunkforwarder/etc/system/local/inputs.conf                          index = linux_os
+/opt/splunkforwarder/etc/system/local/inputs.conf                          sourcetype = system_metrics
+
+CHECK: effective_outputs; exit_code=0
+/opt/splunkforwarder/etc/system/local/outputs.conf                          defaultGroup = default-autolb-group
+/opt/splunkforwarder/etc/system/default/outputs.conf                        useACK = false
+/opt/splunkforwarder/etc/system/local/outputs.conf                          [tcpout-server://indexer.example.invalid:9997]
+/opt/splunkforwarder/etc/system/local/outputs.conf                          [tcpout:default-autolb-group]
+/opt/splunkforwarder/etc/system/local/outputs.conf                          server = indexer.example.invalid:9997
+

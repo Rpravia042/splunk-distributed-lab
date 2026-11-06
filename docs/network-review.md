@@ -20,6 +20,6 @@ The source values are not expanded in this screenshot; the table above was trans
 
 The custom rules express the expected SH-to-IDX and UF-to-IDX relationships. However, `default-allow-internal` also permits broad internal traffic; the presence of narrowly targeted rules alone does not establish internal isolation. The default SSH and RDP rules accept any IPv4 source at the VPC-rule level. A rule does not prove actual Internet reachability or that an RDP service exists on these Linux machines.
 
-The console reported missing `compute.organizations.listAssociations` permission, so inherited firewall policies could not be inspected. Effective exposure remains unverified. Guest firewalls, external addresses while running and listening services also require inspection.
+The console reported missing `compute.organizations.listAssociations` permission, so inherited firewall policies could not be inspected. Effective exposure remains unverified. External addresses were assigned after the authorized boot and have been omitted. Guest listeners and active UF→IDX connections were inspected; see [validation](validation.md). Guest firewall rules and end-to-end certificate identity verification remain unverified.
 
 For a future redesign, use scoped administrative access, remove unnecessary protocol allowances, review inherited policies and enable appropriate logging. These are recommendations, not changes applied to the original lab.

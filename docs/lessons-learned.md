@@ -1,17 +1,20 @@
 # Lessons learned
 
-## Supported by this inspection
+## Findings supported by recovered evidence
 
-1. **Preserve before teardown.** All three boot disks are configured to be deleted with their VMs. A professional handoff requires recovered configuration and a verified backup before retirement.
-2. **Inventory is not application validation.** The console confirms machine properties and power states. It cannot establish forwarding success, installed versions or search correctness.
-3. **Targeted firewall rules do not imply isolation.** The lab has role-specific Splunk rules, alongside broad default internal and administrative rules. Review the whole policy set; inherited policies could not be inspected with the current permissions.
-4. **Snapshot schedules need evidence.** A visible schedule does not prove a completed snapshot or a successful restore.
-5. **Recovery needs provenance.** Original files, sanitized derivatives and new reference examples must be clearly labeled so a reviewer can judge the evidence.
+1. **Prove each stage separately.** Configuration showed intent; source-read checks, matching sockets, indexer results and the SH query demonstrated the actual path. Neither a firewall rule nor an active service alone proved ingestion.
+2. **Make index naming consistent.** The actual index is `linux_os`; generic examples use `lab`. Mixing them during a rebuild would produce misleading empty searches.
+3. **Time controls need one clear meaning.** The dashboard displays a global 24-hour picker but its SPL includes `earliest=-5m`, alongside data-source time parameters. A future dashboard should use one documented time source. The original title also omits the initial “A” in “Average”; it is preserved as evidence.
+4. **Sampling cadence affects interpretation.** The generator runs every five minutes. A five-minute average can contain only one sample or temporarily none. Show sample count and last-event age, and choose a window aligned with the cadence.
+5. **A working lab can still have resource warnings.** SH local health reported yellow disk-space and I/O-wait states. Successful searches and a Healthy peer did not establish production capacity. Measure ingestion, disk growth and query load before sizing a rebuild.
+6. **Narrow rules can coexist with broad access.** Role-specific Splunk rules exist alongside broad default internal/SSH/RDP rules. Inherited policy visibility was incomplete. Review the full effective policy before claiming isolation.
+7. **Encryption must be checked by path.** Web HTTP, a plain TCP forwarding receiver and an HTTPS peer URI have different protection properties. Credentials and encrypted password values still needed removal from recovered configuration.
+8. **Sanitization must preserve meaning and syntax.** A four-part product version resembles an IPv4 address; a Dashboard Studio `token` can be a UI variable. Review context, preserve JSON/XML syntax and retain a private original with hashes.
+9. **Recovery needs usable exports and provenance.** Browser SSH sessions were intermittent and its file-download workflow failed. Bounded, hashed configuration transfers recovered the useful files; raw copies and sanitized derivatives remain separate.
+10. **A schedule is not a tested backup.** One SH snapshot was visible, while no standard snapshots for IDX/UF appeared. All boot disks delete with their VMs. Independent backup verification is required before retirement.
 
-## Improvements for a future deployment
+## Improvements for a new deployment
 
-Use a dedicated VPC and scoped administration; verify TLS and host identity; document supported OS/version combinations; size the indexer for measured ingestion and retention; preserve reproducible configuration; test restore procedures. These improvements have not been applied to the original lab.
+Use a dedicated VPC, scoped administration, verified TLS, supported OS/version combinations, reproducible app configuration, log rotation, deliberate retention and a tested restore procedure. Review UF acknowledgement requirements and the single-indexer failure domain. None of these changes were applied to the original running lab.
 
-## Owner retrospective still to capture
-
-The original setup sequence, assessment constraints, actual failures and fixes, design tradeoffs and live results remain to be recovered from files and the owner's experience. Do not invent a successful incident-resolution story or performance metrics to fill these gaps.
+The owner's original assessment constraints and setup history are not reconstructed from assumptions. This document records inspected behavior and future improvements, not invented incidents or performance achievements.

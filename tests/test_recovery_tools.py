@@ -12,7 +12,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from collect_node import collect
 from sanitize import sanitize
-from check_repo import issues_for_text
+from check_repo import artifact_issues, issues_for_text
 
 
 class SanitizationTests(unittest.TestCase):
@@ -43,6 +43,20 @@ class SanitizationTests(unittest.TestCase):
     def test_normal_config_preserved(self):
         raw = '[tcpout]\ndefaultGroup = lab_indexer\n'
         self.assertEqual(raw, sanitize(raw))
+
+    def test_json_redaction_preserves_syntax(self):
+        raw = json.dumps({'api' + '_key': 'fictional', 'title': 'dashboard'}, indent=2)
+        self.assertEqual(json.loads(sanitize(raw))['api' + '_key'], '[REDACTED]')
+
+    def test_version_metadata_and_address_mapping(self):
+        version = '.'.join(['10', '6', '1', '1'])
+        address = '.'.join(['192', '0', '2', '8'])
+        raw = 'VERSION=' + version + '\nserver=' + address + ':9997\n'
+        clean = sanitize(raw, {address: 'indexer.example.invalid'})
+        self.assertIn('VERSION=' + version, clean)
+        self.assertIn('server=indexer.example.invalid:9997', clean)
+        self.assertEqual(issues_for_text(clean), [])
+        self.assertIn('IPv4 address', issues_for_text('server=' + version))
 
     def test_cli_refuses_overwrite_and_invalid_map(self):
         script = Path(__file__).resolve().parents[1] / 'scripts/sanitize.py'
@@ -98,6 +112,32 @@ class CollectionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaises(ValueError):
                 collect(Path(folder), io.BytesIO())
+
+
+class ArtifactTests(unittest.TestCase):
+    def test_invalid_embedded_dashboard_json_is_detected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / 'configs/recovered/dashboard.xml'
+            path.parent.mkdir(parents=True)
+            path.write_text('<dashboard><definition><![CDATA[{invalid}]]></definition></dashboard>')
+            self.assertTrue(artifact_issues(root))
+            path.write_text('<dashboard><definition><![CDATA[{"title":"sample"}]]></definition></dashboard>')
+            self.assertEqual(artifact_issues(root), [])
+
+    def test_provenance_detects_changed_artifact(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / 'configs/recovered/input.conf'
+            path.parent.mkdir(parents=True)
+            path.write_text('[sample]\n')
+            manifest = {'published_artifacts': [{'artifact': 'configs/recovered/input.conf',
+                        'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}]}
+            (path.parent / 'manifest.json').write_text(json.dumps(manifest))
+            self.assertEqual(artifact_issues(root), [])
+            path.write_text('[changed]\n')
+            self.assertTrue(artifact_issues(root))
 
 
 if __name__ == '__main__':

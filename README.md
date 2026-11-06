@@ -1,66 +1,66 @@
 # Splunk Distributed Lab
 
-A three-node Linux lab on Google Cloud, separating data collection, indexing and search. This portfolio documents the architecture, preserves reviewed configuration, and explains how to validate the data path without exposing operational credentials.
+A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RAM samples travel through a Universal Forwarder to an Indexer, then become searchable from a separate Search Head.
 
-**Recovery in progress — not yet ready for cloud deletion.** All three VMs were observed stopped on **3 November 2026**. Cloud inventory has been inspected; guest files and live Splunk behavior have **not** yet been recovered or verified. This distinction is tracked in the [evidence register](evidence/README.md).
+**Recovered and validated on 3 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The repository remains **private during review**. Cloud retirement is a separate, unfinished step; see the [preservation checklist](docs/preservation-checklist.md).
 
 ## Architecture
 
-![Intended architecture: data flows from UF to IDX; SH searches IDX](docs/architecture.svg)
+![Validated Splunk lab topology](docs/architecture.svg)
 
-[Editable Mermaid source](docs/architecture.mmd)
+[Editable Mermaid source](docs/architecture.mmd) · [Architecture details](docs/architecture.md)
 
-Roles come from the original lab description. Arrows describe the intended design; actual listeners, TLS and ingestion still require guest inspection. This is a single-indexer lab, with no demonstrated clustering or high availability.
+| Node | Responsibility | Observed environment |
+| --- | --- | --- |
+| `splunk-uf` | Monitor three Linux sources and forward to TCP 9997 | Universal Forwarder; `splunkfwd` service account |
+| `splunk-idx` | Receive events, maintain `linux_os`, answer searches | Splunk Enterprise; `splunk` service account |
+| `splunk-sh` | Splunk Web, distributed search and dashboard | Splunk Enterprise; `splunk` service account |
 
-| Node | Role | Observed machine | Source image | Boot disk | Observed state |
-| --- | --- | --- | --- | --- | --- |
-| `splunk-sh` | Search Head | e2-medium, 2 vCPU / 4 GB | CentOS Stream 10 | 20 GB balanced persistent disk | Stopped |
-| `splunk-idx` | Indexer | e2-medium, 2 vCPU / 4 GB | CentOS Stream 10 | 20 GB balanced persistent disk | Stopped |
-| `splunk-uf` | Universal Forwarder | e2-medium, 2 vCPU / 4 GB | CentOS Stream 10 | 20 GB balanced persistent disk | Stopped |
+All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using `e2-medium` VMs with 2 vCPU, 4 GB RAM and a 20 GB balanced disk in `us-central1-c`. This describes the recovered lab; vendor compatibility and production sizing are not established. It is a single-indexer deployment without high availability.
 
-All nodes are in `us-central1-c` on the `default` VPC/subnet. These are observed lab choices, not a production sizing recommendation. Project identifiers, account names, live addresses and SSH keys are intentionally omitted.
+## Demonstrated results
 
-![Google Cloud inventory showing the three stopped VMs](evidence/screenshots/gcp-instances-stopped.jpg)
+- All three Splunk services were running after the owner-authorized boot.
+- UF-to-IDX forwarding had an established TCP connection; the indexer listened on 9997.
+- A Search Head query returned **129,310 events** over its recorded 24-hour interval, across `linux_boot`, `linux_messages` and `system_metrics`, with `splunk_server=splunk-idx`.
+- The search peer was **Up / Successful / Healthy / Enabled**.
+- A separate 30-minute query found six metric events, with CPU and RAM fields extracted in all six. The original dashboard displayed CPU **5.4%** and RAM **21.02%** at capture time.
 
-*Original console capture, cropped to the VM names, zone and state. The crop excludes account, project and address columns. See the evidence register for scope and limitations.*
+![Distributed search with three source types and the expected indexer](evidence/screenshots/splunk-distributed-search.jpg)
 
-## What this project demonstrates
+These are observations at specific capture times, not throughput, durability or availability guarantees. The Search Head also reported yellow disk-space and I/O-wait warnings. [Validation details and limitations](docs/validation.md).
 
-- Separation of collection, indexing and search responsibilities.
-- A documented recovery process with explicit provenance and incomplete-check reporting.
-- Read-only collection tooling and review of sensitive configuration before publication.
-- A validation plan that follows data from the forwarder to an indexer and a search result.
+## Original dashboard
 
-Live validation results will be added only after they are observed. No performance, event-count or availability claims are made at this stage.
+![Original UF System Performance dashboard](evidence/screenshots/splunk-dashboard.jpg)
 
-## Start here
+The screenshot and XML preserve the original panel title, including its typo, and the original time-range behavior. [Dashboard review](docs/lessons-learned.md) explains improvements for a separate rebuild.
 
-| Task | Guide |
+## Explore the project
+
+| Topic | Material |
 | --- | --- |
-| Understand topology and network boundaries | [Architecture](docs/architecture.md) |
-| Inspect the existing deployment | [Infrastructure inventory](docs/infrastructure.md) |
-| Recover configuration without changing services | [Recovery runbook](docs/recovery.md) |
-| Understand examples vs. recovered files | [Configuration](configs/README.md) |
-| Prove forwarding, indexing and search | [Validation](docs/validation.md) |
-| Diagnose missing data or search peers | [Troubleshooting](docs/troubleshooting.md) |
-| Review decisions and improvements | [Lessons learned](docs/lessons-learned.md) |
-| Protect sensitive information | [Security and redaction](SECURITY.md) |
-| Review outstanding work before retiring GCP | [Preservation checklist](docs/preservation-checklist.md) |
-| Continue in Spanish | [Guía en español](docs/guia-es.md) |
+| Recovered source and provenance | [Configuration guide](configs/README.md), [manifest](configs/recovered/manifest.json) |
+| Original data generator | [system_metrics.sh](scripts/original/system_metrics.sh), [five-minute cron schedule](configs/recovered/universal-forwarder/splunkfwd.crontab) |
+| Rebuild in a separate environment | [Rebuild guide](docs/rebuild.md) |
+| Infrastructure and access | [Inventory](docs/infrastructure.md), [network review](docs/network-review.md) |
+| Evidence and validation | [Evidence register](evidence/README.md), [validation](docs/validation.md), [SPL queries](searches) |
+| Recovery and security | [Recovery runbook](docs/recovery.md), [private event backup](docs/event-backup.md), [security](SECURITY.md) |
+| Troubleshooting and lessons | [Troubleshooting](docs/troubleshooting.md), [lessons learned](docs/lessons-learned.md) |
+| Español | [Guía breve](docs/guia-es.md) |
 
-## Local checks
+## Repository checks
 
-Python 3.9+ is sufficient for the repository tools; they have no external Python dependencies.
+Python 3.9+; no external Python dependencies:
 
 ```sh
 python3 -m unittest discover -s tests -v
 python3 scripts/check_repo.py
+bash -n scripts/original/system_metrics.sh
 ```
 
-These checks validate repository hygiene and sanitizer behavior. They do **not** test the live Splunk environment. Collection, review and promotion are separate steps; see the recovery runbook before running commands against a VM.
+Checks cover collection boundaries, sanitization, artifact integrity and dashboard syntax. They do not replace live Splunk validation or manual sensitive-data review.
 
 ## Scope and attribution
 
-This is a personal learning and portfolio project originally built for a technical assessment. It does not contain the assessment prompt, employer material, customer data, Splunk binaries or license files. It is not an official vendor or employer deployment.
-
-The recorded cloud image does not establish compatibility with the installed Splunk version. That version and its supported operating systems still need verification. See [references](docs/references.md).
+A personal portfolio project originally built for a technical assessment. It contains no assessment prompt, employer material, customer records, Splunk binaries or license files, and is not an official vendor or employer deployment. Raw recovery bundles, credentials and event exports remain outside GitHub. Published configurations are reviewed derivatives, not a production deployment package.

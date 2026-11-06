@@ -1,10 +1,10 @@
 # Troubleshooting
 
-These are diagnostic paths, not claims about incidents that occurred in the original lab. Diagnose first and record evidence before proposing a change.
+The table gives diagnostic paths. Observed recovery issues are recorded separately below; suggested fixes have not been applied to the original lab.
 
 | Symptom | Inspect first | How to interpret it |
 | --- | --- | --- |
-| SSH unavailable | Compute Engine power state and existing access method | All three VMs were stopped at inspection; opening ports will not fix that state |
+| SSH unavailable | Compute Engine power state and existing access method | The VMs were initially stopped; after authorized boot, browser SSH sessions sometimes failed or disconnected. Reopening an authorized session allowed recovery |
 | UF has no outgoing data | Source permissions, effective `inputs.conf`, file growth, `outputs.conf` | Confirm a source exists and targets the intended index before blaming networking |
 | UF cannot reach IDX | Destination resolution, receiver listener, guest firewall and VPC rules | An allow rule is not proof of a listener; inspect broad inherited/default rules too |
 | Events arrive in an unexpected index | Input stanza, transforms and destination index existence | Read merged settings with source attribution; a local file can be overridden |
@@ -15,3 +15,11 @@ These are diagnostic paths, not claims about incidents that occurred in the orig
 | Settings appear ignored | `btool <name> list --debug`, service start/reload history | Effective on-disk configuration may differ from loaded configuration |
 
 Do not restart services, disable TLS, broaden firewall access, rotate credentials or rewrite configuration as part of evidence collection. Propose a specific correction separately if needed. Keep passwords out of command arguments and screenshots.
+
+## Issues observed during recovery
+
+- **Intermittent SSH and failed browser downloads:** new browser SSH sessions allowed file reads; small hashed transfers recovered configuration. No network policy or SSH server settings were changed.
+- **Cloud telemetry permission failures:** SH serial output contained Ops Agent errors for `logging.logEntries.create` and `monitoring.timeSeries.create`. They concern Cloud Logging/Monitoring and do not by themselves explain SSH failures or Splunk ingestion. Full logs remain private; no IAM change was made.
+- **Splunk Web event download blocked:** Chrome returned `ERR_BLOCKED_BY_CLIENT` for the export. A manual owner download was requested; export is not considered complete until the local file passes count and readability checks.
+- **Disk and I/O warnings:** SH local health showed yellow disk-space and IOWait warnings despite completed searches. Diagnose growth, retention and workload before increasing capacity or changing thresholds.
+- **Dashboard time-range mismatch:** compare the hardcoded five-minute SPL filter with global and data-source time parameters. Preserve the original while testing a corrected version in a separate environment.

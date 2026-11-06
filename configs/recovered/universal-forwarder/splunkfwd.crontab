@@ -1,0 +1,1 @@
+*/5 * * * * /usr/local/bin/system_metrics.sh >> /var/log/splunk-lab/system_performance.log 2>> /var/log/splunk-lab/system_metrics_error.log

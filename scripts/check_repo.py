@@ -5,9 +5,11 @@ Does not scan Git history or certify safety. Raw private directories are skipped
 """
 
 import hashlib
+import json
 from pathlib import Path
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 from sanitize import EMAIL, PROVIDER_PATTERN
 
@@ -15,10 +17,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SKIP = {'.git', '.recovery', '__pycache__'}
 BLOCKED_NAMES = {'splunk.secret', 'passwd', 'passwords.conf', 'user-seed.conf', '.env'}
 BLOCKED_SUFFIXES = {'.pem', '.key', '.p12', '.pfx', '.lic', '.tar', '.tgz', '.zip', '.log'}
-TEXT_SUFFIXES = {'.md', '.mmd', '.svg', '.py', '.sh', '.conf', '.json', '.yaml', '.yml', '.spl', '.txt'}
+TEXT_SUFFIXES = {'.md', '.mmd', '.svg', '.py', '.sh', '.conf', '.json', '.yaml', '.yml', '.spl', '.txt', '.xml', '.service', '.version', '.crontab', '.meta'}
 
 
 def issues_for_text(text):
+    # Reviewed product version, never a blanket exemption for address-like strings.
+    address_text = re.sub(r'(?mi)^VERSION\s*=\s*10\.6\.1\.1$', 'VERSION=<VERSION>', text)
+    address_text = address_text.replace('Splunk 10.6.1.1', 'Splunk <VERSION>')
     checks = {
         'private key': r'-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----',
         'Splunk encrypted value': r'\$[147]\$[^\s\"\x27,;]{8,}',
@@ -27,7 +32,8 @@ def issues_for_text(text):
         'cloud project identifier': r'project-[a-f0-9]{8}-[a-f0-9-]{8,}',
         'IPv4 address': r'(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])',
     }
-    issues = [name for name, pattern in checks.items() if re.search(pattern, text)]
+    issues = [name for name, pattern in checks.items()
+              if re.search(pattern, address_text if name == 'IPv4 address' else text)]
     if PROVIDER_PATTERN.search(text):
         issues.append('provider token')
     if EMAIL.search(text):
@@ -41,13 +47,38 @@ def issues_for_text(text):
             value = match[2].strip().strip(',').strip('\"\x27')
             if match[1].lower() == 'persist-credentials' and value == 'false':
                 continue  # GitHub checkout's credential-storage switch, not a secret.
+            if match[1] == 'token' and value == 'global_time':
+                continue  # Reviewed Dashboard Studio time-range variable, not an auth token.
             if value and not value.startswith(('[REDACTED', '<REDACTED')):
                 issues.append('sensitive assignment')
     return sorted(set(issues))
 
 
-def main():
+def artifact_issues(root):
     errors = []
+    manifest = root / 'configs/recovered/manifest.json'
+    if manifest.exists():
+        try:
+            for item in json.loads(manifest.read_text())['published_artifacts']:
+                path = root / item['artifact']
+                if not path.resolve().is_relative_to(root.resolve()):
+                    raise ValueError('Artifact escapes repository')
+                if hashlib.sha256(path.read_bytes()).hexdigest() != item['sha256']:
+                    errors.append((item['artifact'], 'recovered artifact hash mismatch'))
+        except (OSError, ValueError, KeyError, TypeError):
+            errors.append(('configs/recovered/manifest.json', 'invalid or incomplete provenance'))
+    for path in (root / 'configs/recovered').rglob('*.xml'):
+        try:
+            tree = ET.parse(path)
+            for definition in tree.iter('definition'):
+                json.loads(definition.text or '')
+        except (OSError, ET.ParseError, ValueError):
+            errors.append((str(path.relative_to(root)), 'invalid dashboard XML or embedded JSON'))
+    return errors
+
+
+def main():
+    errors = artifact_issues(ROOT)
     reviewed_images = {}
     hashfile = ROOT / 'evidence/SHA256SUMS'
     if hashfile.exists():

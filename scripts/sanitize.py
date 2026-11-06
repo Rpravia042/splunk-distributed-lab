@@ -18,9 +18,21 @@ PROVIDER_PATTERN = re.compile(r'\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za
 
 
 def sanitize(text, replacements=None):
+    # Exact reviewed mappings must precede generic address redaction.
+    for original, replacement in sorted((replacements or {}).items(), key=lambda item: -len(item[0])):
+        text = text.replace(original, replacement)
     text = PRIVATE_BLOCK.sub('[REDACTED_PRIVATE_KEY]', text)
     text = SSH_KEY.sub('[REDACTED_SSH_KEY]', text)
-    text = ASSIGNMENT.sub(lambda m: m.group(1) + '[REDACTED]', text)
+    def redact_assignment(match):
+        # Keep a quoted JSON value and its trailing comma syntactically valid.
+        line = match.group()
+        prefix = match.group(1)
+        value = line[len(prefix):].strip()
+        if value.startswith('"'):
+            return prefix + '"[REDACTED]"' + (',' if value.endswith(',') else '')
+        return prefix + '[REDACTED]'
+
+    text = ASSIGNMENT.sub(redact_assignment, text)
     text = re.sub(r'(?i)(Authorization\s*[:=]\s*(?:Bearer|Basic)\s+)\S+', r'\1[REDACTED]', text)
     text = re.sub(r'(https?://)[^\s/@]+:[^\s/@]+@', r'\1[REDACTED]@', text)
     text = re.sub(r'\$[147]\$[^\s\"\x27,;]+', '[REDACTED_SPLUNK_VALUE]', text)
@@ -35,9 +47,9 @@ def sanitize(text, replacements=None):
             return match.group()
         return '[REDACTED_IPV4]'
 
-    text = IPV4.sub(redact_ip, text)
-    for original, replacement in sorted((replacements or {}).items(), key=lambda item: -len(item[0])):
-        text = text.replace(original, replacement)
+    # Splunk's version metadata uses four numeric components, like an IPv4 address.
+    text = '\n'.join(line if re.fullmatch(r'(?i)VERSION\s*=\s*\d+(?:\.\d+){3}', line)
+                     else IPV4.sub(redact_ip, line) for line in text.split('\n'))
     return text
 
 

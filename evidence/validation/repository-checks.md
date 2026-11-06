@@ -1,13 +1,14 @@
 # Repository checks
 
-Run locally on 2026-11-03 with Python 3.9.6.
+Last run locally on 2026-11-06 with Python 3.9.6. The same checks run in GitHub Actions.
 
 | Check | Result | Scope |
 | --- | --- | --- |
-| `python3 -m unittest discover -s tests -v` | PASS, 8 tests | Synthetic sanitizer tests, safe overwrite refusal, bounded collection, excluded secret stores and symlink rejection |
-| `python3 scripts/check_repo.py` | PASS | Recognizable sensitive patterns, disallowed files, local documentation links and reviewed screenshot hashes |
-| Screenshot review | PASS | VM and firewall crops visually inspected; account, project and live-address details excluded |
+| `python3 -m unittest discover -s tests -v` | PASS, 16 tests | Collection boundaries, secret-store exclusions, symlinks, redaction syntax, version/address handling, provenance mismatches, dashboard syntax and private export count/truncation checks |
+| `python3 scripts/check_repo.py` | PASS | Recognizable sensitive patterns, disallowed file types, local documentation links, reviewed image hashes, recovered artifact hashes, dashboard XML/JSON |
+| `bash -n scripts/original/system_metrics.sh` | PASS | Shell syntax only; the recovered script was not executed locally |
+| Screenshot review | PASS | Seven real captures reviewed; account/project/live-address details excluded |
 
-These results do not demonstrate guest recovery, Splunk compatibility, forwarding, search success, secure transport or a successful restore. All live checks remain pending in [the validation matrix](../../docs/validation.md).
+These checks are separate from [live Splunk validation](../../docs/validation.md). They do not certify OS compatibility, secure transport, complete sensitive-data removal or restore success.
 
-The sanitizer has known limits: custom credentials, inline structured fields, command arguments, IPv6, free-form business data and filenames require manual review. The collector is bounded and selective; every skipped or unreadable file must be considered before declaring preservation complete.
+Custom credentials, inline structured fields, arguments, IPv6, free-form business content and filenames still require manual review. The collector is selective, and its scope is documented in the recovery runbook. Private event-export verification must use the actual downloaded file; synthetic tests do not prove that an export completed.

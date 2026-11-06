@@ -2,7 +2,11 @@
 
 ## Current boundary
 
-All VMs are stopped. No guest collection has run. The owner must authorize power-on and any required temporary SSH-key registration before either action. Do not invoke Cloud Shell, `gcloud compute ssh`, enable APIs or register keys as a workaround for that restriction. An existing connection may be used only within its already authorized access.
+The owner explicitly authorized boot and temporary browser SSH access to all three VMs on 2026-11-03. Those actions were completed. Services started automatically. Firewall, IAM, Splunk configuration, credentials and original data sources were not deliberately changed. Shutdown, snapshots and deletion require separate authorization.
+
+The recovery verified **41 original files**: 27 configuration/version/service files, three UF script/schedule/source files, and 11 metadata files. Private runtime captures cover all three nodes. Nineteen reviewed derivatives were promoted to GitHub; the [manifest](../configs/recovered/manifest.json) explains the 22 private-only omissions.
+
+Browser SSH file download failed. A bounded JSON/base64 transfer through the existing terminals recovered selected files, with local SHA-256 comparison for every file. Temporary compressed copies were written under `/tmp` on the guests; original files were not overwritten. This was a configuration rescue, not a full disk image.
 
 ## Preparation
 
@@ -41,7 +45,7 @@ Record version/build from `etc/splunk.version`, then verify the installation and
 
 ## Effective configuration and validation
 
-After inspecting stored files, use the existing service identity and verified Splunk path to capture selected `btool` outputs into private local evidence. Running Splunk CLI tools may create diagnostic files; do not run them until guest diagnostic execution is authorized. `btool ... --debug` identifies merged settings and source files, but does not prove that the service has loaded current disk changes. See the [Splunk btool guide](https://help.splunk.com/en/splunk-enterprise/administer/troubleshoot/9.3/first-steps/use-btool-to-troubleshoot-configurations).
+After inspecting stored files, use the existing service identity and verified Splunk path to capture selected `btool` outputs into private local evidence. Running Splunk CLI tools may create diagnostic files; use them only within authorized diagnostic access. `btool ... --debug` identifies merged settings and source files, but does not prove that the service has loaded current disk changes. See the [Splunk btool guide](https://help.splunk.com/en/splunk-enterprise/administer/troubleshoot/9.3/first-steps/use-btool-to-troubleshoot-configurations).
 
 ```text
 <SPLUNK_HOME>/bin/splunk btool inputs list --debug

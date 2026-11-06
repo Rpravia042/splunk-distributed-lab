@@ -1,16 +1,21 @@
-# Guía de continuación
+# Guía breve en español
 
-El repositorio conserva la estructura profesional del laboratorio y la evidencia que sí se ha observado. Las tres VMs están detenidas; todavía no se han recuperado sus archivos ni validado el funcionamiento de Splunk.
+El laboratorio ya tiene un repositorio privado con documentación en inglés, configuración original revisada, script de CPU/RAM, tarea programada, dashboard y capturas reales.
 
 ## Confirmado
 
-- Tres nodos: `splunk-sh`, `splunk-idx` y `splunk-uf`, en `us-central1-c`.
-- Los tres usan `e2-medium`, imagen CentOS Stream 10 y disco de arranque de 20 GB.
-- Existen reglas específicas para los puertos 8000, 8089 y 9997, además de reglas predeterminadas más amplias.
-- Los discos están configurados para borrarse con las VMs. No se ha borrado ni modificado ningún recurso de Google Cloud.
+- Tres VMs en `us-central1-c`, encendidas con autorización del propietario; los tres servicios Splunk están activos.
+- UF envía tres tipos de datos al índice `linux_os` del Indexer.
+- Search Head consulta el Indexer: una búsqueda documentada devolvió 129.310 eventos y el peer estaba `Up / Healthy`.
+- El dashboard mostró CPU 5,4 % y RAM 21,02 %. Se conservaron su definición y comportamiento originales.
+- Se verificaron 41 archivos recuperados y se seleccionaron 19 derivados revisados para publicar. Los originales y las exportaciones de eventos quedan fuera de GitHub.
 
-## Pendiente
+## Cómo recorrerlo
 
-Encender las VMs y registrar acceso SSH, si hace falta, requiere autorización explícita del propietario. Después se recuperarán configuraciones, scripts, dashboards y evidencia real. Los archivos nuevos en `configs/examples/` son referencias y **no representan archivos recuperados**.
+Empieza por el [README](../README.md), luego revisa [arquitectura](architecture.md), [validaciones](validation.md) y [configuración recuperada](../configs/recovered/README.md). La [guía de reconstrucción](rebuild.md) explica cómo recrear el diseño en otro entorno.
 
-Consulta el [procedimiento de recuperación](recovery.md), el [registro de evidencia](../evidence/README.md) y la [lista de preservación](preservation-checklist.md). No elimines el proyecto mientras el rescate siga incompleto.
+## Antes de cerrar Google Cloud
+
+Consulta la [lista de preservación](preservation-checklist.md). El propietario solicitó conservar también todos los eventos; su copia privada se verifica por separado. Las VMs siguen encendidas y consumen recursos. No se ha autorizado ni realizado su eliminación, cambios de red, rotación de credenciales o reconfiguración de Splunk. Apagar o eliminar requiere una autorización posterior y concreta.
+
+Hay limitaciones documentadas: HTTP en Splunk Web, forwarding sin TLS, avisos de espacio/I/O y ausencia de alta disponibilidad. La sanitización automática ayuda, pero no sustituye la revisión humana antes de hacer público el repositorio.
