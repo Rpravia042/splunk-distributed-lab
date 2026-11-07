@@ -1,0 +1,60 @@
+{
+  "captured_utc": "2026-11-07T14:47:53Z",
+  "node": "splunk-sh",
+  "status": "SEARCH_SPACE_BLOCKER_RESOLVED",
+  "authorization": "Owner approved SH boot disk 20 to 30 GB and required partition/filesystem growth; owner retains server archive",
+  "boot_disk_gb": 30,
+  "root_device": "/dev/sda2",
+  "filesystem": "xfs",
+  "before": {
+    "disk_bytes": 32212254720,
+    "root_partition_bytes": 21263024128,
+    "filesystem_total_bytes": 21195915264,
+    "available_bytes": 4799356928
+  },
+  "after": {
+    "root_partition_bytes": 32001474048,
+    "filesystem_total_bytes": 31934361600,
+    "available_bytes": 15011602432
+  },
+  "partition_start_sector_unchanged": 411648,
+  "efi_partition_unchanged": true,
+  "service": {
+    "name": "Splunkd.service",
+    "active": "active",
+    "substate": "running",
+    "active_since_utc": "2026-11-03T15:55:57Z",
+    "restarted_for_repair": false
+  },
+  "key_sh_files_compared": 5,
+  "key_sh_hashes_match_original": true,
+  "server_archive_retained": true,
+  "server_archive_bytes": 1315156954,
+  "local_archive_verification": {
+    "status": "PASS",
+    "bytes": 1315156954,
+    "sha256": "862896d6d027b53106216b82c2f0b546c2bafe794bdb5734a3dee076ff8280a1",
+    "method": "Exact size and SHA-256 match to fully parsed server archive"
+  },
+  "search": {
+    "status": "Complete",
+    "start_utc": "2026-11-07T14:27:09Z",
+    "end_utc": "2026-11-07T14:47:09Z",
+    "host": "splunk-uf",
+    "splunk_server": "splunk-idx",
+    "count": 4,
+    "latest_event_utc": "2026-11-07T14:45:02Z"
+  },
+  "dashboard": {
+    "name": "UF System Performance",
+    "average_cpu_percent": 4,
+    "average_ram_percent": 23.23,
+    "original_definition_preserved": true
+  },
+  "limits": [
+    "Point-in-time operational check",
+    "Other health warnings not certified resolved",
+    "No full restore tested",
+    "Events after export cutoff excluded"
+  ]
+}

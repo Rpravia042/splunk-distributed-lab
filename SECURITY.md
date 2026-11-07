@@ -2,7 +2,9 @@
 
 ## Preservation rules
 
-The owner requires explicit approval before any Google Cloud resource modification or deletion. Boot and temporary browser SSH access to the three named VMs were explicitly authorized and completed. Services started automatically. Further firewall/IAM/metadata changes, snapshots, disk attachment, shutdown and deletion have not been authorized.
+The owner requires explicit approval before any Google Cloud resource modification or deletion. Authorized work comprised boot and temporary browser SSH access to the three named VMs, private recovery/export files, a backup-only temporary SSH key, and expansion of the existing SH boot disk from 20 to 30 GB with the necessary partition/XFS growth. The backup-only key entry was removed after its verified transfer, and its local private key was deleted. SH was not restarted for the capacity repair. Original Splunk configurations were preserved; five key SH files still matched their recovered hashes afterward.
+
+The owner chose to retain the server-side event archive and the same three VMs for an interview. No index deletion, Splunk reconfiguration, firewall/IAM change, password rotation or cloud teardown was performed. Other cloud changes and shutdown/deletion require separate explicit authorization. The repository remains private until its owner chooses public release; raw recovery and event data stay outside GitHub regardless of visibility.
 
 Private repository visibility is not a substitute for sanitization. Never commit credentials, tokens, private keys, Splunk's `splunk.secret`, password databases, license files, authentication bundles, raw logs, cloud credential exports or original assessment material. Encrypted Splunk values are still sensitive.
 

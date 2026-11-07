@@ -41,6 +41,24 @@ Search-peer health was positive, while the **Search Head's local health** was ye
 
 `splunk_server` identifies the peer associated with results; [official guidance](https://help.splunk.com/en/splunk-enterprise/search/search-manual/10.2/retrieve-events/search-across-one-or-more-distributed-search-peers). It does not establish loss-free ingestion, redundancy or restore success.
 
-## Interview-readiness check — 2026-11-06
+## Interview-readiness checks — 2026-11-06 and 2026-11-07
 
-A later live query for the last 20 minutes was refused because the Search Head dispatch directory reached the configured minimum free space. The backup operation left a verified 1.3 GB archive on that host; service state was still active/running. This check does not supersede the historical passing results above, but the current lab must not be described as ready for a live demonstration until storage is released and a fresh query succeeds.
+A live query on 6 November was refused because SH reached its dispatch minimum free space. The backup operation had produced a verified 1.3 GB archive plus temporary search storage; the service was still active/running. The owner retained the server archive and authorized a 20→30 GB SH disk expansion, including partition/filesystem growth.
+
+On **7 November**, GPT/root-partition/XFS growth completed without rebooting or restarting Splunk. At **14:47:53 UTC**, `/opt/splunk` had **15,011,602,432 bytes available**; `Splunkd.service` was active/running, with the same start timestamp of 3 November 15:55:57 UTC. Distributed-search configuration, server configuration, dashboard XML, service unit and version file all matched their original recovered SHA-256 hashes.
+
+The following query completed through SH for **14:27:09–14:47:09 UTC**:
+
+```spl
+index=linux_os sourcetype=system_metrics earliest=-20m latest=now
+| stats count latest(_time) AS latest_event by host splunk_server
+| eval latest_event=strftime(latest_event,"%Y-%m-%d %H:%M:%S %z")
+```
+
+| host | splunk_server | count | latest_event |
+| --- | --- | ---: | --- |
+| splunk-uf | splunk-idx | 4 | 2026-11-07 14:45:02 +0000 |
+
+![Completed post-repair search](../evidence/screenshots/splunk-search-restored.png)
+
+The unchanged original dashboard also rendered **Average CPU 4% / Average RAM 23.23%**. [Post-repair dashboard capture](../evidence/screenshots/splunk-dashboard-restored.png). Its original five-minute SPL filter and time-range caveats still apply. These checks demonstrate restored searches and recent end-to-end data, not an overall warning-free health certification or a tested full restore. Recheck shortly before any future interview, since services and available space can change.

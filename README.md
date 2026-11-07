@@ -2,7 +2,7 @@
 
 A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RAM samples travel through a Universal Forwarder to an Indexer, then become searchable from a separate Search Head.
 
-**Recovered and validated on 3 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The repository remains **private during review**. The original VMs are being retained for future demonstrations. A later backup operation left insufficient free space for new Search Head searches; [current status and recovery work](docs/preservation-checklist.md) are tracked separately from the historical validation results below.
+**Recovered on 3 November; live searches revalidated on 7 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The original three VMs are retained for future demonstrations. After a private event backup exhausted the Search Head's search-space reserve, an owner-authorized disk and XFS expansion restored searches. A fresh query returned recent UF samples from the Indexer, and the original dashboard rendered CPU/RAM values. [Current status and preservation limits](docs/preservation-checklist.md).
 
 ## Architecture
 
@@ -16,7 +16,7 @@ A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RA
 | `splunk-idx` | Receive events, maintain `linux_os`, answer searches | Splunk Enterprise; `splunk` service account |
 | `splunk-sh` | Splunk Web, distributed search and dashboard | Splunk Enterprise; `splunk` service account |
 
-All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using `e2-medium` VMs with 2 vCPU, 4 GB RAM and a 20 GB balanced disk in `us-central1-c`. This describes the recovered lab; vendor compatibility and production sizing are not established. It is a single-indexer deployment without high availability.
+All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using `e2-medium` VMs with 2 vCPU and 4 GB RAM in `us-central1-c`. All originally had 20 GB balanced disks; SH now has 30 GB after the authorized capacity repair. IDX and UF retain 20 GB disks. Vendor compatibility and production sizing are not established. It is a single-indexer deployment without high availability.
 
 ## Demonstrated results
 
@@ -29,6 +29,10 @@ All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using 
 ![Distributed search with three source types and the expected indexer](evidence/screenshots/splunk-distributed-search.jpg)
 
 These are observations at specific capture times, not throughput, durability or availability guarantees. The Search Head also reported yellow disk-space and I/O-wait warnings. [Validation details and limitations](docs/validation.md).
+
+On **7 November 2026**, a completed 20-minute query found four metric events from `splunk-uf` on `splunk-idx`, latest **14:45:02 UTC**. SH had about **15.0 GB free** after the repair. The private archive contains **8,697,141 events** through its fixed cutoff; its local copy matches the fully validated server archive by size and SHA-256. No full restore has been tested.
+
+![Successful search after the capacity repair](evidence/screenshots/splunk-search-restored.png)
 
 ## Original dashboard
 

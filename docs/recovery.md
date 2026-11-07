@@ -4,6 +4,8 @@
 
 The owner explicitly authorized boot and temporary browser SSH access to all three VMs on 2026-11-03. Those actions were completed. Services started automatically. Firewall, IAM, Splunk configuration, credentials and original data sources were not deliberately changed. Shutdown, snapshots and deletion require separate authorization.
 
+Subsequent owner-authorized work preserved a complete fixed-cutoff event export, used and removed a temporary backup-only SSH key, and expanded SH's boot disk/partition/XFS from 20 to 30 GB to restore searches while retaining the server archive. The same three VMs remain in place for an interview. See the [change record](change-record.md) for scope and post-repair verification.
+
 The recovery verified **41 original files**: 27 configuration/version/service files, three UF script/schedule/source files, and 11 metadata files. Private runtime captures cover all three nodes. Nineteen reviewed derivatives were promoted to GitHub; the [manifest](../configs/recovered/manifest.json) explains the 22 private-only omissions.
 
 Browser SSH file download failed. A bounded JSON/base64 transfer through the existing terminals recovered selected files, with local SHA-256 comparison for every file. Temporary compressed copies were written under `/tmp` on the guests; original files were not overwritten. This was a configuration rescue, not a full disk image.

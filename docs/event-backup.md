@@ -41,7 +41,13 @@ The expanded query was:
 | stats count by index
 ```
 
-The job used substantial temporary storage. It was finalized when the Search Head's free space fell below the planned margin. After finalization, Splunk reported all six expected counts and confirmed the output file. A “Partial results” job label is not enough to determine archive completeness: the archive itself must pass full decompression, field checks and exact per-index counts. The server verification completed on **2026-11-06 at 23:08:45 UTC**: **PASS, 8,697,141 records, no missing required fields, and successful gzip CRC/EOF validation**. The compressed archive is 1,315,156,954 bytes. Download and local hash verification remain pending; see the [preservation checklist](preservation-checklist.md).
+The job used substantial temporary storage. It was finalized when the Search Head's free space fell below the planned margin. After finalization, Splunk reported all six expected counts and confirmed the output file. A “Partial results” job label is not enough to determine archive completeness: the archive itself must pass full decompression, field checks and exact per-index counts. The server verification completed on **2026-11-06 at 23:08:45 UTC**: **PASS, 8,697,141 records, no missing required fields, and successful gzip CRC/EOF validation**. The compressed archive is **1,315,156,954 bytes**. The completed local transfer has the identical byte count and SHA-256:
+
+```text
+862896d6d027b53106216b82c2f0b546c2bafe794bdb5734a3dee076ff8280a1
+```
+
+The local copy therefore matches the fully parsed server archive byte for byte. It remains private under `.recovery/event-export/`. Transfer used owner-authorized, time-limited, backup-only SSH access with pinned host identity; the exact key entry and local private key were removed afterward. The owner also chose to keep the archive on SH. The [capacity repair](troubleshooting.md#backup-storage-incident--2026-11-06) preserved that copy and restored searches.
 
 The trailing `stats` was used to display counts. For a future export, consider ending the query at `outputcsv` and validating counts from the resulting file; the large combined search and result processing need a deliberate disk budget. Use unique filenames, bounded captures and access restrictions. Do not overwrite existing backup files or change production retention to free space.
 

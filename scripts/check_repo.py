@@ -97,7 +97,7 @@ def main():
         if path.name in BLOCKED_NAMES or path.suffix.lower() in BLOCKED_SUFFIXES or path.name.startswith('.env.'):
             errors.append((str(rel), 'blocked file type/name'))
             continue
-        if path.suffix.lower() == '.jpg':
+        if path.suffix.lower() in {'.jpg', '.png'}:
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
             if reviewed_images.get(str(rel)) != digest:
                 errors.append((str(rel), 'image has no matching reviewed hash'))

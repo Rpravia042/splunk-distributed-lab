@@ -14,9 +14,9 @@ El laboratorio ya tiene un repositorio privado con documentación en inglés, co
 
 Empieza por el [README](../README.md), luego revisa [arquitectura](architecture.md), [validaciones](validation.md) y [configuración recuperada](../configs/recovered/README.md). La [guía de reconstrucción](rebuild.md) explica cómo recrear el diseño en otro entorno.
 
-## Antes de cerrar Google Cloud
+## Preservación de Google Cloud
 
-Consulta la [lista de preservación](preservation-checklist.md). El propietario solicitó conservar también todos los eventos; su copia privada se verifica por separado. Las VMs siguen encendidas y consumen recursos. No se ha autorizado ni realizado su eliminación, cambios de red, rotación de credenciales o reconfiguración de Splunk. Apagar o eliminar requiere una autorización posterior y concreta.
+Consulta la [lista de preservación](preservation-checklist.md). Se conservarán las mismas VMs para la entrevista; siguen encendidas y consumen recursos. No se eliminaron VMs ni índices, ni se cambiaron la red, las contraseñas o la configuración de Splunk. Se autorizó ampliar únicamente el disco de Search Head de 20 a 30 GB y completar su partición y sistema de archivos. Apagar o eliminar requiere una autorización posterior y concreta.
 
 Hay limitaciones documentadas: HTTP en Splunk Web, forwarding sin TLS, avisos de espacio/I/O y ausencia de alta disponibilidad. La sanitización automática ayuda, pero no sustituye la revisión humana antes de hacer público el repositorio.
 
@@ -24,4 +24,8 @@ Hay limitaciones documentadas: HTTP en Splunk Web, forwarding sin TLS, avisos de
 
 Se conservarán las mismas tres VMs. No se reinstaló Splunk ni se modificaron sus configuraciones originales. En Search Head, cinco archivos clave coinciden con sus hashes originales, incluido el dashboard y la unidad de servicio.
 
-El respaldo comprimido de 8.697.141 eventos pasó la validación completa en la VM, pero todavía requiere una copia local verificada. Su almacenamiento dejó poco espacio libre en Search Head y Splunk rechazó una búsqueda nueva por el mínimo de 5.000 MB. Antes de una demostración hay que liberar el almacenamiento del respaldo después de verificar su copia y repetir una búsqueda pequeña. El servicio continúa activo; los datos originales siguen en sus índices.
+El respaldo comprimido de **8.697.141 eventos** pasó la validación completa en la VM y su copia local coincide en tamaño y SHA-256. Ambas copias se conservan de forma privada. La clave temporal limitada a leer ese respaldo se retiró tras la transferencia; también se eliminó su clave privada local. No es una restauración completa probada.
+
+El bloqueo de búsquedas por espacio quedó resuelto el **7 de noviembre de 2026**. Google Cloud ya mostraba 30 GB, pero faltaba ampliar la partición de Linux y XFS. Se completó sin reiniciar la VM ni Splunk. La comprobación final encontró unos **15 GB libres**, cuatro muestras recientes de UF consultadas desde SH en IDX y el dashboard original con CPU **4 %** / RAM **23,23 %**. [Cambios y comprobaciones](change-record.md).
+
+Para la próxima entrevista, enciende las tres VMs si están detenidas, confirma la dirección actual de `splunk-sh` en Google Cloud y abre Splunk Web en su puerto 8000. Inicia sesión con tus credenciales habituales. Ejecuta la consulta breve de [validación](validation.md) y abre **Dashboards → UF System Performance**. Comprueba de nuevo los resultados y el espacio antes de demostrarlo; esta captura no garantiza su estado futuro.

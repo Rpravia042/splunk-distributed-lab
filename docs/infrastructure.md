@@ -13,7 +13,7 @@ Inspected in the authenticated Google Cloud console on **2026-11-03**, using rea
 | VPC / subnet | default / default | default / default | default / default |
 | NIC | nic0 | nic0 | nic0 |
 | Network tag | splunk-sh | splunk-idx | splunk-uf |
-| Boot disk | 20 GB pd-balanced | 20 GB pd-balanced | 20 GB pd-balanced |
+| Boot disk | Originally 20 GB; now 30 GB pd-balanced | 20 GB pd-balanced | 20 GB pd-balanced |
 | Disk deletion behavior | Delete with VM | Delete with VM | Delete with VM |
 | VM deletion protection | Disabled | Disabled | Disabled |
 | Snapshot schedule shown | default-schedule-1 | default-schedule-1 | default-schedule-1 |
@@ -25,6 +25,8 @@ Guest `/etc/os-release` confirmed CentOS Stream 10. All nodes report Splunk 10.6
 ![Authorized running state](../evidence/screenshots/gcp-instances-running.jpg)
 
 At capture, SH disk usage was 54% (9.2 GB available), IDX 53% (9.3 GB available), and UF 20% (16 GB available). SH local health still reported yellow disk-space and I/O-wait warnings; see [validation](validation.md).
+
+On **2026-11-07**, the owner-authorized SH capacity repair was completed. The console showed a 30 GB disk, but Linux initially retained its old 20 GB root partition. GPT was adjusted to the enlarged device, the end of the existing root partition was extended, and XFS was grown online. Its start sector and the EFI partition were preserved. The final root filesystem reported **31,934,361,600 bytes total** and **15,011,602,432 bytes available** at 14:47:53 UTC. SH remained active/running with the same service start timestamp; no reboot or service restart was used. IDX/UF disk sizes were not changed. See the [change record](change-record.md).
 
 The console showed a daily snapshot schedule beginning between 17:00 and 18:00 in its displayed timezone. A schedule is **not evidence of a complete or restorable backup**.
 
@@ -38,6 +40,6 @@ See the separately captured [network review](network-review.md) for the seven vi
 
 - Guest firewall rules, comprehensive package inventory and vendor compatibility validation.
 - Remaining instance startup metadata, other snapshot categories, effective IAM, routes and hierarchical firewall policies.
-- Indexed-event export verification, independent backup and a tested restore.
+- Additional off-computer backup and a tested restore; the local event export already matches the fully verified server archive.
 
 Do not delete VMs or the project while these preservation tasks remain open.
