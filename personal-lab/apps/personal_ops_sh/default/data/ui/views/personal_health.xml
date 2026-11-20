@@ -1,0 +1,29 @@
+<dashboard version="1.1">
+  <label>Personal lab health</label>
+  <row><panel><title>Available disk space on the monitored filesystem</title><chart>
+    <search><query>index=personal_ops sourcetype=personal:capacity
+| spath
+| eval available_gib=round(available_bytes/1073741824,2)
+| timechart span=1m min(available_gib) by host</query>
+    <earliest>-60m</earliest><latest>now</latest></search>
+    <option name="charting.chart">line</option>
+  </chart></panel></row>
+  <row><panel><title>Expected forwarders and last sample</title><table>
+    <search><query>| makeresults
+| eval host="personal-uf", expected=1
+| append [search index=personal_ops sourcetype=personal:capacity earliest=-15m latest=now
+| stats max(_time) AS last_seen by host]
+| stats max(expected) AS expected max(last_seen) AS last_seen by host
+| where expected=1
+| eval age_seconds=round(now()-last_seen), status=case(isnull(last_seen),"No sample in 15 min",age_seconds&gt;180,"Late",true(),"Reporting")
+| table host status age_seconds</query>
+    <earliest>-15m</earliest><latest>now</latest></search>
+  </table></panel></row>
+  <row><panel><title>Ingestion delay in seconds (source clock must be accurate)</title><chart>
+    <search><query>index=personal_ops sourcetype=personal:capacity
+| eval delay_seconds=_indextime-_time
+| timechart span=5m perc95(delay_seconds) by host</query>
+    <earliest>-60m</earliest><latest>now</latest></search>
+    <option name="charting.chart">column</option>
+  </chart></panel></row>
+</dashboard>

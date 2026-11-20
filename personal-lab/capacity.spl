@@ -1,0 +1,5 @@
+index=personal_ops sourcetype=personal:capacity earliest=-15m
+| spath
+| stats latest(available_bytes) AS available_bytes latest(capacity_state) AS capacity_state latest(_time) AS last_sample BY host
+| eval available_GiB=round(available_bytes/1073741824,2), last_sample=strftime(last_sample,"%F %T %z")
+| table host available_GiB capacity_state last_sample
