@@ -1,6 +1,6 @@
 # Personal Splunk lab
 
-Three installable app directories implement a capacity and ingestion pilot for new, isolated Linux nodes. The Search Head dashboard shows available GiB, missing forwarder samples and 95th-percentile ingestion delay. The explicit expected-host row keeps silent sources visible. Samples are collected once per minute; after three minutes a host is late. If no event is found in the 15-minute search window, the dashboard reports a missing sample.
+Three installable app directories implement a capacity and ingestion pilot for new, isolated Linux nodes. The Search Head dashboard shows available GiB, missing forwarder samples and 95th-percentile ingestion delay. The explicit expected-host row keeps silent sources visible. Samples are collected once per minute; after three minutes without newly indexed data the forwarder is late. If no sample was indexed in the last 15 minutes, the dashboard reports a missing sample.
 
 ## Local verification
 
@@ -30,5 +30,11 @@ From the repository root run `python3 -m unittest discover -s tests -v`. On macO
    | search probe_id="YOUR_UUID"
    | stats count by host splunk_server
    ```
+
+## Status table semantics
+
+The status table measures liveness by index time (`_indextime`, Indexer clock) and refreshes every 60 seconds. It calculates lag from that same sample and considers event timestamps from the past 24 hours through the next day. `Late` means nothing was indexed for more than three minutes. `Clock ahead` means the latest sample is more than 60 seconds in the future. `Arriving late` means samples keep arriving but are more than 180 seconds old; this cannot distinguish pipeline delay from a UF clock running behind, so check `chronyc tracking` on the UF. Manual probes that use `-host personal-uf` and `personal:capacity` refresh this row; use a different sourcetype or host for probes.
+
+To reproduce the cases, run [sim-panel-cases.sh](sim-panel-cases.sh) on the personal UF (for example `sh sim-panel-cases.sh ahead600 600 3`). It sends synthetic samples as host `sim-CASE`. Run the table query with `personal-uf` replaced by that host. Record the status one, four, eleven and fourteen minutes after the last event. The charts show synthetic samples only when their event timestamps fall within the selected window. The index applies the same retention settings as for regular samples. Do not change a VM clock.
 
 See [the GCP pilot plan](piloto-gcp.md). Cloud deployment, SPL runtime behavior and end-to-end results require verification on the personal nodes.
