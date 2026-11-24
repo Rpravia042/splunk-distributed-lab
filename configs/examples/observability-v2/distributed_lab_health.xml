@@ -1,0 +1,85 @@
+<dashboard version="1.1">
+  <label>Distributed Lab Health</label>
+  <description>UF resource measurements and data delivery to Splunk.</description>
+  <row>
+    <panel>
+      <title>Forwarder delivery status</title>
+      <table>
+        <search>
+          <query>| makeresults
+| eval host="example-forwarder", expected=1
+| append [search index=example_ops sourcetype=example:metrics earliest=1 latest=+1d _index_earliest=-30m
+    | eval host=lower(host)
+    | sort 0 - _indextime - _time
+    | dedup host
+    | eval indexed_at=_indextime, ingest_seconds=_indextime-_time
+    | fields host indexed_at ingest_seconds]
+| stats max(expected) AS expected max(indexed_at) AS indexed_at max(ingest_seconds) AS ingest_seconds BY host
+| eval age_seconds=round(now()-indexed_at), status=case(isnull(expected),"Unexpected host",isnull(indexed_at),"No sample in window",age_seconds&gt;720,"Silent",ingest_seconds&lt; -60,"Clock ahead",ingest_seconds&gt;600,"Arriving late or clock behind",true(),"Reporting")
+| eval last_indexed=strftime(indexed_at,"%F %T %z")
+| table host status last_indexed age_seconds ingest_seconds</query>
+          <earliest>-30m</earliest>
+          <latest>now</latest>
+          <refresh>120s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>UF CPU and RAM (%)</title>
+      <chart>
+        <search>
+          <query>index=example_ops sourcetype=example:metrics host=example-forwarder
+| timechart span=5m avg(cpu_usage) AS CPU avg(ram_usage) AS RAM</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>UF filesystem available (GiB)</title>
+      <chart>
+        <search>
+          <query>index=example_ops sourcetype=example:metrics host=example-forwarder metrics_version=2
+| eval available_gib=disk_available_kib/1048576
+| timechart span=5m min(available_gib) AS Available</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Latest UF filesystem and system measurements</title>
+      <table>
+        <search>
+          <query>index=example_ops sourcetype=example:metrics host=example-forwarder metrics_version=2
+| sort 0 - _time
+| head 1
+| eval available_gib=round(disk_available_kib/1048576,2), capacity=if(disk_available_kib&lt;6291456,"Below 6 GiB","OK")
+| table _time host available_gib disk_used_pct capacity load_1m uptime_seconds swap_used_kib</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Recent ingestion delay (seconds)</title>
+      <chart>
+        <search>
+          <query>index=example_ops sourcetype=example:metrics host=example-forwarder
+| eval ingest_seconds=_indextime-_time
+| timechart span=5m perc95(ingest_seconds) AS P95</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
