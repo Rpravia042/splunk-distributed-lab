@@ -4,6 +4,10 @@ A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RA
 
 **Recovered on 3 November; live searches revalidated on 7 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The original three VMs are retained for future demonstrations. After a private event backup exhausted the Search Head's search-space reserve, an owner-authorized disk and XFS expansion restored searches. A fresh query returned recent UF samples from the Indexer, and the original dashboard rendered CPU/RAM values. [Current status and preservation limits](docs/preservation-checklist.md).
 
+## Personal monitoring pilot
+
+[Installable monitoring apps and verification steps](personal-lab/README.md) for a separate three-node rebuild. The pilot adds filesystem capacity, missing-source detection and ingestion delay. Live validation of the personal environment is pending.
+
 ## Architecture
 
 ![Validated Splunk lab topology](docs/architecture.svg)
