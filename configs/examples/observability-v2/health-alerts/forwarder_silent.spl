@@ -1,0 +1,21 @@
+| makeresults
+| eval host="example-forwarder", expected=1
+| append [search index=example_ops sourcetype=example:metrics host=example-forwarder earliest=1 latest=+1d _index_earliest=-30m
+    | stats max(_indextime) AS last_sample BY host]
+| append [search index=_internal sourcetype=splunkd source=*metrics.log earliest=1 latest=+1d _index_earliest=-20m (host=example-forwarder OR host=example-indexer)
+    | stats max(_indextime) AS last_internal BY host
+    | eval uf_internal=if(host="example-forwarder",last_internal,null()), idx_internal=if(host="example-indexer",last_internal,null()), host="example-forwarder"
+    | fields host uf_internal idx_internal]
+| append [| rest splunk_server=example-indexer /services/server/status/partitions-space
+    | where mount_point="/"
+    | eval host="example-forwarder", idx_free_mb=tonumber(free)
+    | fields host idx_free_mb]
+| append [| rest splunk_server=example-indexer /services/data/inputs/tcp/cooked
+    | stats count(eval(disabled=0)) AS idx_receivers
+    | eval host="example-forwarder"]
+| stats max(expected) AS expected max(last_sample) AS last_sample max(uf_internal) AS uf_internal max(idx_internal) AS idx_internal min(idx_free_mb) AS idx_free_mb max(idx_receivers) AS idx_receivers BY host
+| where expected=1
+| eval sample_age_s=now()-last_sample, uf_internal_age_s=now()-uf_internal, idx_internal_age_s=now()-idx_internal
+| where isnull(last_sample) OR sample_age_s>720
+| eval status=case(isnull(idx_free_mb),"Indexer disk telemetry missing",idx_free_mb<5000,"Indexer below free-space floor",isnull(idx_internal) OR idx_internal_age_s>300,"Indexer internal telemetry stale",idx_receivers=0,"No enabled receiver observed",isnull(uf_internal) OR uf_internal_age_s>720,"UF or path silent",true(),"UF internal events arrive; check collector or input")
+| table host status sample_age_s uf_internal_age_s idx_internal_age_s idx_free_mb idx_receivers

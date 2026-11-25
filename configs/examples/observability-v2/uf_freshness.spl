@@ -1,0 +1,12 @@
+| makeresults
+| eval host="example-forwarder", expected=1
+| append [search index=example_ops sourcetype=example:metrics earliest=1 latest=+1d _index_earliest=-30m
+    | eval host=lower(host)
+    | sort 0 - _indextime - _time
+    | dedup host
+    | eval indexed_at=_indextime, ingest_seconds=_indextime-_time
+    | fields host indexed_at ingest_seconds]
+| stats max(expected) AS expected max(indexed_at) AS indexed_at max(ingest_seconds) AS ingest_seconds BY host
+| eval age_seconds=round(now()-indexed_at), status=case(isnull(expected),"Unexpected host",isnull(indexed_at),"No sample in window",age_seconds>720,"Silent",ingest_seconds< -60,"Clock ahead",ingest_seconds>600,"Arriving late or clock behind",true(),"Reporting")
+| eval last_indexed=strftime(indexed_at,"%F %T %z")
+| table host status last_indexed age_seconds ingest_seconds

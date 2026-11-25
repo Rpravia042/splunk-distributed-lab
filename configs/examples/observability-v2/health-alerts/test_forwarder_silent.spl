@@ -1,0 +1,7 @@
+| makeresults count=7
+| streamstats count AS case_id
+| eval host="example-".case_id, last_sample=now()-case(case_id=1,50,case_id=7,720,true(),900), uf_internal=now()-if(case_id=6,850,20), idx_internal=now()-15, idx_free_mb=case(case_id=2,4000,case_id=3,null(),true(),8000), idx_receivers=if(case_id=4,0,1)
+| eval sample_age_s=now()-last_sample, uf_internal_age_s=now()-uf_internal, idx_internal_age_s=now()-idx_internal
+| where isnull(last_sample) OR sample_age_s>720
+| eval status=case(isnull(idx_free_mb),"Indexer disk telemetry missing",idx_free_mb<5000,"Indexer below free-space floor",isnull(idx_internal) OR idx_internal_age_s>300,"Indexer internal telemetry stale",idx_receivers=0,"No enabled receiver observed",isnull(uf_internal) OR uf_internal_age_s>720,"UF or path silent",true(),"UF internal events arrive; check collector or input")
+| table host status sample_age_s uf_internal_age_s idx_internal_age_s idx_free_mb idx_receivers

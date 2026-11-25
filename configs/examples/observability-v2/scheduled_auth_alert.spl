@@ -1,0 +1,8 @@
+| inputlookup lab_synthetic_auth_demo.csv
+| where scenario="synthetic-auth-v1"
+| eval _time=tonumber(event_ts)
+| where _time>=now()-900 AND _time<=now()
+| sort 0 _time
+| streamstats time_window=10m count(eval(action="failure")) AS failures_by_source BY user source_label
+| where action="failure" AND failures_by_source=5 AND _time>now()-300
+| table _time user source_label failures_by_source

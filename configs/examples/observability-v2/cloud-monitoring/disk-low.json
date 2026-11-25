@@ -1,0 +1,17 @@
+{
+  "displayName": "Splunk Search Head - low dispatch disk space",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "Dispatch filesystem below 8 GiB for five minutes",
+      "conditionThreshold": {
+        "filter": "resource.type = \"gce_instance\" AND resource.labels.instance_id = \"EXAMPLE_INSTANCE_ID\" AND metric.type = \"agent.googleapis.com/disk/bytes_used\" AND metric.labels.device = \"EXAMPLE_DEVICE\" AND metric.labels.state = \"free\"",
+        "comparison": "COMPARISON_LT",
+        "thresholdValue": 8589934592,
+        "duration": "300s",
+        "evaluationMissingData": "EVALUATION_MISSING_DATA_INACTIVE"
+      }
+    }
+  ],
+  "enabled": true
+}
