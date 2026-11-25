@@ -17,3 +17,5 @@ The ingestion delay chart groups events by when they arrive at the index, so a r
 3. Run the seed after saving the alert to repeat the exercise. Wait for the scheduler rather than using a manual run as evidence. Check Triggered Alerts and open View Results. Expect one row for `demo-a` with five failures. Later runs age out that fixed batch. The other cases cover four failures followed by success, and five failures spread over twelve minutes.
 
 This alert uses a private CSV lookup and works independently of a log index. A future Python exercise can generate or validate the same fictional input. Map `login_failed` and `login_success` from its JSON Lines schema to `failure` and `success` in the fixture, retaining the event timestamp and source label. Keep the fixture separate from real login records.
+
+For scheduled checks of Forwarder silence and available capacity on the Search Head and Indexer, see [the health alerts and synthetic tests](health-alerts/README.md).

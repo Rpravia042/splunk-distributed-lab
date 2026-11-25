@@ -1,0 +1,6 @@
+| makeresults count=3
+| streamstats count AS case_id
+| eval splunk_server="example-".case_id, location="fixture", mount_point="/", free_mb=case(case_id=1,6144,case_id=2,4800,true(),null())
+| eval status=case(isnull(free_mb),"Missing telemetry",free_mb<6144,"Low disk space",true(),"OK"), free_gib=round(free_mb/1024,2)
+| where status!="OK"
+| table splunk_server location mount_point status free_gib

@@ -1,0 +1,13 @@
+| makeresults
+| eval expected_row=split("example-search-head|dispatch|/;example-indexer|indexes|/",";")
+| mvexpand expected_row
+| eval parts=split(expected_row,"|"), splunk_server=mvindex(parts,0), location=mvindex(parts,1), mount_point=mvindex(parts,2), expected=1
+| fields splunk_server location mount_point expected
+| append [| rest splunk_server=* /services/server/status/partitions-space
+    | eval free_mb=tonumber(free)
+    | fields splunk_server mount_point free_mb]
+| stats max(expected) AS expected values(location) AS location min(free_mb) AS free_mb BY splunk_server mount_point
+| where expected=1
+| eval status=case(isnull(free_mb),"Missing telemetry",free_mb<6144,"Low disk space",true(),"OK"), free_gib=round(free_mb/1024,2)
+| where status!="OK"
+| table splunk_server location mount_point status free_gib
