@@ -39,7 +39,7 @@ These are observations at specific capture times, not throughput, durability or 
 | Symptom | Splunk Web was reachable, but new searches were refused at the minimum free-space threshold. |
 | Diagnosis | The filesystem holding the Search Head dispatch directory had fallen below the configured 5,000 MB floor. |
 | Recovery | The boot disk, guest partition and XFS filesystem were extended. A new distributed search verified the repair. |
-| Prevention | The [Cloud Monitoring policy examples](configs/examples/observability-v2/cloud-monitoring/README.md) detect low space and missing disk metrics independently of Splunk. The live incident tests are pending. |
+| Prevention | The [Cloud Monitoring policy examples](configs/examples/observability-v2/cloud-monitoring/README.md) detect low space and missing disk metrics independently of Splunk. [Controlled tests verified incident opening and recovery](configs/examples/observability-v2/cloud-monitoring/README.md#observed-validation). |
 
 On **7 November 2026**, a completed 20-minute query found four metric events from `splunk-uf` on `splunk-idx`, latest **14:45:02 UTC**. SH had about **15.0 GB free** after the repair. The private archive contains **8,697,141 events** through its fixed cutoff; its local copy matches the fully validated server archive by size and SHA-256. No full restore has been tested.
 
