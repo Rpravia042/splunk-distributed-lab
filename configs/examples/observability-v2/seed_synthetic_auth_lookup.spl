@@ -1,0 +1,10 @@
+| makeresults
+| eval edge=ceil((now()+15)/300)*300-10, fixture="-240~demo-a~workstation-1~failure;-180~demo-a~workstation-1~failure;-120~demo-a~workstation-1~failure;-60~demo-a~workstation-1~failure;0~demo-a~workstation-1~failure;-240~demo-b~workstation-2~failure;-180~demo-b~workstation-2~failure;-120~demo-b~workstation-2~failure;-60~demo-b~workstation-2~failure;0~demo-b~workstation-2~success;-720~demo-c~workstation-3~failure;-540~demo-c~workstation-3~failure;-360~demo-c~workstation-3~failure;-180~demo-c~workstation-3~failure;0~demo-c~workstation-3~failure"
+| makemv delim=";" fixture
+| mvexpand fixture
+| eval parts=split(fixture,"~")
+| eval event_ts=edge+tonumber(mvindex(parts,0)), user=mvindex(parts,1), source_label=mvindex(parts,2), action=mvindex(parts,3), scenario="synthetic-auth-v1"
+| table event_ts user source_label action scenario
+| outputlookup create_context=user lab_synthetic_auth_demo.csv
+| stats count max(event_ts) as threshold_at
+| eval threshold_utc=strftime(threshold_at,"%Y-%m-%d %H:%M:%S %z")
