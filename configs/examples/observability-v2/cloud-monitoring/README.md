@@ -39,6 +39,17 @@ The 8 GiB threshold is an example. Set the threshold above the effective Splunk 
 3. For the absence policy, confirm that it observes at least one data point after creation. Test loss of a disposable time series or use a maintenance window for the agent. Verify that an absence incident opens, then that it closes after points resume. VM lifecycle state can affect absence detection, so use a separate VM status check if you need to detect a stopped VM.
 4. Attach an approved notification channel after testing if operators need delivery outside the console.
 
+## Observed validation
+
+On 25 November 2026, the Ops Agent was running but its disk series was empty because the attached service account lacked permission to publish metrics. Granting Monitoring Metric Writer restored the series. Its available-space reading agreed with Linux before alert testing began.
+
+| Exercise | Observed result | Setting after the test |
+| --- | --- | --- |
+| Low disk space | A temporary threshold above the current reading opened an incident without filling the disk. The diagnostic run included a two-minute window and one-minute alignment. The test incidents were closed after the original policy settings were restored. | 8 GiB for five minutes |
+| Missing disk metrics | A two-minute test window detected a controlled interruption of the metrics collector. The collector restarted automatically, new points arrived, and Cloud Monitoring closed the incident. Splunk stayed active during the test. | Ten minutes without points |
+
+Both policies were confirmed enabled after testing. Incident status was checked in Cloud Monitoring with no external notification channels attached. The exercises verified detection and recovery with temporary test settings. The normal retest windows were restored and verified separately.
+
 ## If Splunk has already stopped dispatching
 
 Check available bytes on the dispatch filesystem. If the disk needs to grow, verify a recent backup and follow the provider's disk resize procedure. Compare the cloud disk, guest partition and filesystem sizes independently. On an XFS system, extend the mounted filesystem after the guest recognizes the larger partition. Rerun an actual Splunk search and check scheduler results after the repair.
