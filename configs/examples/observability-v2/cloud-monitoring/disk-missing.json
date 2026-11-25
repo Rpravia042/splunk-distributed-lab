@@ -1,0 +1,14 @@
+{
+  "displayName": "Splunk Search Head - dispatch disk metric missing",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "No dispatch disk metric for ten minutes",
+      "conditionAbsent": {
+        "filter": "resource.type = \"gce_instance\" AND resource.labels.instance_id = \"EXAMPLE_INSTANCE_ID\" AND metric.type = \"agent.googleapis.com/disk/bytes_used\" AND metric.labels.device = \"EXAMPLE_DEVICE\" AND metric.labels.state = \"free\"",
+        "duration": "600s"
+      }
+    }
+  ],
+  "enabled": true
+}

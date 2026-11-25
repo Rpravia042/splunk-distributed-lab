@@ -19,3 +19,5 @@ The ingestion delay chart groups events by when they arrive at the index, so a r
 This alert uses a private CSV lookup and works independently of a log index. A future Python exercise can generate or validate the same fictional input. Map `login_failed` and `login_success` from its JSON Lines schema to `failure` and `success` in the fixture, retaining the event timestamp and source label. Keep the fixture separate from real login records.
 
 For scheduled checks of Forwarder silence and available capacity on the Search Head and Indexer, see [the health alerts and synthetic tests](health-alerts/README.md).
+
+For alerting that works while the Search Head cannot dispatch searches, see [the Cloud Monitoring disk policies and validation guide](cloud-monitoring/README.md).
