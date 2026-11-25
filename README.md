@@ -1,8 +1,10 @@
 # Splunk Distributed Lab
 
-A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RAM samples travel through a Universal Forwarder to an Indexer, then become searchable from a separate Search Head.
+A three-node Splunk Enterprise lab on Google Cloud. Follow Linux telemetry from collection to distributed search, then see how the lab recovered when the Search Head ran short of disk space.
 
-**Recovered on 3 November; live searches revalidated on 7 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The original three VMs are retained for future demonstrations. After a private event backup exhausted the Search Head's search-space reserve, an owner-authorized disk and XFS expansion restored searches. A fresh query returned recent UF samples from the Indexer, and the original dashboard rendered CPU/RAM values. [Current status and preservation limits](docs/preservation-checklist.md).
+[Architecture](#architecture) · [Verified results](#demonstrated-results) · [Disk recovery](#disk-capacity-case-study) · [Rebuild guide](docs/rebuild.md) · [Guía en español](docs/guia-es.md)
+
+**Recovered on 3 November; live searches revalidated on 7 November 2026.** The original configuration, metrics script, schedule and Dashboard Studio definition are preserved with provenance. The original three VMs and the recorded validation are the basis for the examples below. [Current status and preservation limits](docs/preservation-checklist.md).
 
 ## Architecture
 
@@ -16,7 +18,7 @@ A working three-node Splunk lab on Google Cloud: Linux logs and scheduled CPU/RA
 | `splunk-idx` | Receive events, maintain `linux_os`, answer searches | Splunk Enterprise; `splunk` service account |
 | `splunk-sh` | Splunk Web, distributed search and dashboard | Splunk Enterprise; `splunk` service account |
 
-All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using `e2-medium` VMs with 2 vCPU and 4 GB RAM in `us-central1-c`. All originally had 20 GB balanced disks; SH now has 30 GB after the authorized capacity repair. IDX and UF retain 20 GB disks. Vendor compatibility and production sizing are not established. It is a single-indexer deployment without high availability.
+All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using `e2-medium` VMs with 2 vCPU and 4 GB RAM in `us-central1-c`. The [infrastructure inventory](docs/infrastructure.md) records the original storage layout. Vendor compatibility and production sizing are not established. It is a single-indexer deployment without high availability.
 
 ## Demonstrated results
 
@@ -29,6 +31,15 @@ All three run Splunk 10.6.1.1 (build `b2ae2962645c`) on CentOS Stream 10, using 
 ![Distributed search with three source types and the expected indexer](evidence/screenshots/splunk-distributed-search.jpg)
 
 These are observations at specific capture times, not throughput, durability or availability guarantees. The Search Head also reported yellow disk-space and I/O-wait warnings. [Validation details and limitations](docs/validation.md).
+
+## Disk capacity case study
+
+| Stage | What happened |
+| --- | --- |
+| Symptom | Splunk Web was reachable, but new searches were refused at the minimum free-space threshold. |
+| Diagnosis | The filesystem holding the Search Head dispatch directory had fallen below the configured 5,000 MB floor. |
+| Recovery | The boot disk, guest partition and XFS filesystem were extended. A new distributed search verified the repair. |
+| Prevention | The [Cloud Monitoring policy examples](configs/examples/observability-v2/cloud-monitoring/README.md) detect low space and missing disk metrics independently of Splunk. The live incident tests are pending. |
 
 On **7 November 2026**, a completed 20-minute query found four metric events from `splunk-uf` on `splunk-idx`, latest **14:45:02 UTC**. SH had about **15.0 GB free** after the repair. The private archive contains **8,697,141 events** through its fixed cutoff; its local copy matches the fully validated server archive by size and SHA-256. No full restore has been tested.
 
@@ -47,6 +58,7 @@ The screenshot and XML preserve the original panel title, including its typo, an
 | Recovered source and provenance | [Configuration guide](configs/README.md), [manifest](configs/recovered/manifest.json) |
 | Original data generator | [system_metrics.sh](scripts/original/system_metrics.sh), [five-minute cron schedule](configs/recovered/universal-forwarder/splunkfwd.crontab) |
 | Rebuild in a separate environment | [Rebuild guide](docs/rebuild.md) |
+| Extend monitoring and alerting | [Example dashboard and alert searches](configs/examples/observability-v2/README.md) |
 | Infrastructure and access | [Inventory](docs/infrastructure.md), [network review](docs/network-review.md) |
 | Evidence and validation | [Evidence register](evidence/README.md), [validation](docs/validation.md), [SPL queries](searches) |
 | Recovery and security | [Recovery runbook](docs/recovery.md), [private event backup](docs/event-backup.md), [security](SECURITY.md) |
