@@ -69,12 +69,13 @@
       </table>
     </panel>
     <panel>
-      <title>Recent ingestion delay (seconds)</title>
+      <title>Ingestion delay by arrival time (seconds)</title>
       <chart>
         <search>
-          <query>index=example_ops sourcetype=example:metrics host=example-forwarder
-| eval ingest_seconds=_indextime-_time
-| timechart span=5m perc95(ingest_seconds) AS P95</query>
+          <query>index=example_ops sourcetype=example:metrics host=example-forwarder earliest=1 latest=+1d _index_earliest=-60m
+| eval ingest_seconds=_indextime-_time, _time=_indextime
+| bin _time span=5m
+| stats perc95(ingest_seconds) AS P95 BY _time</query>
           <earliest>-60m</earliest>
           <latest>now</latest>
         </search>

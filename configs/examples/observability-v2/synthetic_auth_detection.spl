@@ -1,0 +1,10 @@
+| makeresults
+| eval fixture="0~demo-a~workstation-1~failure;60~demo-a~workstation-1~failure;120~demo-a~workstation-1~failure;180~demo-a~workstation-1~failure;240~demo-a~workstation-1~failure;0~demo-b~workstation-2~failure;60~demo-b~workstation-2~failure;120~demo-b~workstation-2~failure;180~demo-b~workstation-2~failure;240~demo-b~workstation-2~success;0~demo-c~workstation-3~failure;240~demo-c~workstation-3~failure;480~demo-c~workstation-3~failure;720~demo-c~workstation-3~failure;960~demo-c~workstation-3~failure"
+| makemv delim=";" fixture
+| mvexpand fixture
+| eval parts=split(fixture,"~")
+| eval _time=now()-1200+tonumber(mvindex(parts,0)), user=mvindex(parts,1), source_label=mvindex(parts,2), action=mvindex(parts,3)
+| sort 0 _time
+| streamstats time_window=10m count(eval(action="failure")) as failures_by_source by user source_label
+| where action="failure" AND failures_by_source=5
+| table user source_label failures_by_source
